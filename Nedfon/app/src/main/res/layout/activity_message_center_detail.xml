@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:background="@color/white"
+    android:id="@+id/my_information_layout"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.2"
+        android:weightSum="1.2"
+        android:orientation="vertical"
+        android:background="@drawable/title_bar_bg"
+        >
+        <include layout="@layout/top_layout"></include>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8.8"
+        android:background="@color/white"
+        android:orientation="vertical"
+        >
+        <TextView
+            android:id="@+id/activity_message_center_detail_title_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="绿岛风住宅全热新风系统解决方案"
+            android:textSize="14sp"
+            android:textColor="@color/black"
+            android:gravity="center"
+            android:layout_marginTop="30dp"
+            />
+        <TextView
+            android:id="@+id/activity_message_center_detail_time_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="2018-01-02"
+            android:textSize="12sp"
+            android:textColor="@color/text_gray"
+            android:gravity="center"
+            android:layout_marginTop="5dp"
+            />
+
+        <TextView
+            android:id="@+id/activity_message_center_detail_content_tv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1.换风、除臭、除尘功能。取自高空的新鲜空气，经过滤、除尘、灭菌、加热/降温、加湿/除湿等处理过程，以较低风风速，从房间一侧送风口不间断送出，同个合理的气流组织，新鲜空气经过人的活动区域，带走人员活动产生的扬尘，气味等，从排风口派出，达到净化室内空气的目的。 \n \n2.湿度调节功能。有效调节室内空气湿度，是居室时刻保持干爽、舒适的状态，对西安冬季的干燥空气有加湿的作用。\n\n3.节能。不用开窗既可获得新鲜空气，减少室内热损失，节省能源。\n\n4.过滤有害物质。祛除室内装饰造成的可能长时间存在的有害气体。"
+            android:textSize="10sp"
+            android:textColor="@color/shen_gray"
+            android:lineSpacingExtra="5dp"
+            android:layout_marginTop="25dp"
+            android:layout_marginLeft="10dp"
+            android:layout_marginRight="10dp"
+            />
+    </LinearLayout>
+</LinearLayout>

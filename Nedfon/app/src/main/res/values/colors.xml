@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="colorPrimary">#3F51B5</color>
+    <color name="colorPrimaryDark">#303F9F</color>
+    <color name="colorAccent">#FF4081</color>
+
+    <color name="black">#000000</color>
+    <color name="shen_gray">#999999</color>
+    <color name="text_gray">#B9B9B9</color>
+    <color name="white">#ffffff</color>
+    <color name="activity_login_forgotpwd">#25D4B7</color>
+    <color name="login_bg">#AAD9E1</color>
+    <color name="message_center_list_bg">#F0F0F0</color>
+    <color name="device_bind_set_internet_text">#3F94BA</color>
+    <color name="item_device_bind_item_txt_color">#23D1B4</color>
+    <color name="activity_device_bg_line_color">#BCBCBC</color>
+    <color name="activity_device_bgcolor">#F5F5F5</color>
+    <color name="activity_device_center_txt_color">#5D5D5D</color>
+    <color name="activity_device_yellow_txt_color">#FFAB3D</color>
+    <color name="activity_device_green_txt_color">#24D4B7</color>
+
+    <color name="yellow_txt_color">#ffab3d</color>
+    <color name="green_txt_color">#22d5b5</color>
+    <color name="device_gray_shen">#585858</color>
+    <color name="my_gray_shen">#232323</color>
+    <color name="device_gray_qian">#b9b9b9</color>
+    <color name="colorPrimaryDarkTrans">#CCf57257</color>
+
+</resources>

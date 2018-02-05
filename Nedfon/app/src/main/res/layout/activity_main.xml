@@ -1,0 +1,16 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    >
+    <com.nedfon.nedfon.view.NoScrollViewPager
+        android:id="@+id/id_viewpager"
+        android:layout_weight="1"
+        android:layout_width="match_parent"
+        android:layout_height="0dp">
+    </com.nedfon.nedfon.view.NoScrollViewPager>
+
+    <include layout="@layout/main_bottom" />
+
+</LinearLayout>

@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:orientation="vertical"
+    android:layout_height="match_parent"
+    android:weightSum="10"
+    android:background="@color/white"
+    android:id="@+id/my_information_layout"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1.2"
+        android:weightSum="1.2"
+        android:orientation="vertical"
+        android:background="@drawable/title_bar_bg"
+        >
+        <include layout="@layout/top_layout"></include>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8.8"
+        >
+        <ListView
+            android:id="@+id/activity_message_center_lv"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:divider="@color/message_center_list_bg"
+            android:background="@color/message_center_list_bg"
+            android:dividerHeight="0dp"
+            ></ListView>
+    </LinearLayout>
+</LinearLayout>
