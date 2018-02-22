@@ -1,5 +1,6 @@
 package com.nedfon.nedfon.uiok;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -34,8 +35,8 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
     private boolean mIsSelected = false;
     private DeviceInfo info = null;
 
-    private boolean isdi = true;
-    private boolean misdi = true;
+    private int isdi = 0;
+    private int misdi = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,13 +51,20 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
     }
 
     private void initData() {
-        isdi = info.workgear==1?true:false;
-        if (isdi){
+//        Log.e("oooooooooo","deviceid = "+info.deviceid);
+//        ToastUtils.show(ExhaustVentilatorOkActivity.this,info.deviceid);
+        isdi = info.workgear;
+        misdi = isdi;
+        if (isdi==1){
             mDiIv.setImageResource(R.drawable.stall_btn_selected);
             mHignIv.setImageResource(R.drawable.stall_btn_unselect);
-        } else {
+        } else if (isdi==2) {
             mDiIv.setImageResource(R.drawable.stall_btn_unselect);
             mHignIv.setImageResource(R.drawable.stall_btn_selected);
+        } else {
+            mDiIv.setImageResource(R.drawable.stall_btn_unselect);
+            mHignIv.setImageResource(R.drawable.stall_btn_unselect);
+
         }
     }
 
@@ -78,7 +86,7 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.activity_exhaust_ventilation_f1_rl:
-                isdi = true;
+                isdi = 1;
                 mDiIv.setImageResource(R.drawable.stall_btn_selected);
                 mHignIv.setImageResource(R.drawable.stall_btn_unselect);
                 if (misdi != isdi){
@@ -92,7 +100,7 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
                 }
                 break;
             case R.id.activity_exhaust_ventilation_f2_rl:
-                isdi = false;
+                isdi = 2;
                 mDiIv.setImageResource(R.drawable.stall_btn_unselect);
                 mHignIv.setImageResource(R.drawable.stall_btn_selected);
                 if (misdi != isdi){
@@ -109,8 +117,8 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
                 if (mIsSelected) {
                     mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
                     mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                    doControlWindCmdGet(CommonUtils.token,info.sn,info.ionsflag+"",
-                            isdi?"1":"2","1",info.workmodel+"","1",info.status+"");
+                    doControlWindCmdGet(CommonUtils.token,info.deviceid,info.ionsflag+"",
+                            isdi+"","1",info.workmodel+"","1",info.status+"");
                 }
                 break;
             default:
@@ -199,6 +207,8 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
 
     @Override
     protected void setBackOnClick() {
+        Intent deviceIntent = new Intent(ExhaustVentilatorOkActivity.this,DeviceOkActivity.class);
+        startActivity(deviceIntent);
         this.finish();
     }
 }

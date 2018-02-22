@@ -1,12 +1,16 @@
 package com.nedfon.nedfon.uiok;
 
+import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -22,24 +26,40 @@ import com.espressif.iot.esptouch.IEsptouchTask;
 import com.espressif.iot.esptouch.demo_activity.EspWifiAdminSimple;
 import com.espressif.iot.esptouch.task.__IEsptouchTask;
 import com.nedfon.nedfon.R;
+import com.nedfon.nedfon.ui.LoginActivity;
+import com.nedfon.nedfon.utils.MacUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 
 import java.lang.reflect.Method;
 import java.util.List;
+
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS;
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
+import static android.Manifest.permission.ACCESS_WIFI_STATE;
+import static android.Manifest.permission.BLUETOOTH;
+import static android.Manifest.permission.BLUETOOTH_ADMIN;
+import static android.Manifest.permission.CHANGE_NETWORK_STATE;
+import static android.Manifest.permission.CHANGE_WIFI_MULTICAST_STATE;
+import static android.Manifest.permission.CHANGE_WIFI_STATE;
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.READ_PHONE_STATE;
+import static android.Manifest.permission.VIBRATE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_SETTINGS;
 
 public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implements View.OnClickListener {
 
     private TextView mConnectPrompttv;
     private RelativeLayout mConnectRl;
 
-
-    private WifiManager wifiManager;
-    private boolean flag=false;
-
     private String name = "nedfon001";
     private String pwd = "nedfon123456";
 
     private boolean isopen = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -47,8 +67,11 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         setTitleText("设备配网");
         NAME = DeviceInternetHotOkActivity.class.getSimpleName();
         setImage(2);
-        mWifiAdmin = new EspWifiAdminSimple(this);
 
+
+        primissionAsk();
+
+        mWifiAdmin = new EspWifiAdminSimple(this);
         initView();
     }
 
@@ -71,11 +94,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
 
         mConnectRl.setOnClickListener(this);
 
-        Boolean open = setWifiApEnabled(flag);
-        if (open){
-            mConnectPrompttv.setText("热点成功开启！");
-            isopen = true;
-        }
+        startWifiAp();
     }
 
     @Override
@@ -87,11 +106,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                     setConnectDevice();
                 } else {
                     ToastUtils.show(DeviceInternetHotOkActivity.this,"热点开始失败,请稍后再试");
-                    Boolean open = setWifiApEnabled(flag);
-                    if (open){
-                        mConnectPrompttv.setText("热点成功开启！");
-                        isopen = true;
-                    }
+                    startWifiAp();
                 }
                 break;
             default:
@@ -99,26 +114,42 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         }
     }
 
-    // wifi热点开关
-    public boolean setWifiApEnabled(boolean enabled) {
-        if (enabled) { // disable WiFi in any case
-            //wifi和热点不能同时打开，所以打开热点的时候需要关闭wifi
+    private WifiManager wifiManager = null;
+
+    private void startWifiAp() {
+        if (wifiManager.isWifiEnabled()) {
             wifiManager.setWifiEnabled(false);
         }
+        Method method = null;
         try {
-            //热点的配置类
-            WifiConfiguration apConfig = new WifiConfiguration();
-            //配置热点的名称(可以在名字后面加点随机数什么的)
-            apConfig.SSID = name;
-            //配置热点的密码
-            apConfig.preSharedKey = pwd;
-            //通过反射调用设置热点
-            Method method = wifiManager.getClass().getMethod(
-                    "setWifiApEnabled", WifiConfiguration.class, Boolean.TYPE);
-            //返回热点打开状态
-            return (Boolean) method.invoke(wifiManager, apConfig, enabled);
+            method = wifiManager.getClass().getMethod("setWifiApEnabled",
+                    WifiConfiguration.class, boolean.class);
+            method.setAccessible(true);
+            WifiConfiguration netConfig = new WifiConfiguration();
+            netConfig.SSID = name;
+            netConfig.preSharedKey =  pwd;
+            netConfig.allowedAuthAlgorithms
+                    .set(WifiConfiguration.AuthAlgorithm.OPEN);
+            netConfig.allowedProtocols.set(WifiConfiguration.Protocol.RSN);
+            netConfig.allowedProtocols.set(WifiConfiguration.Protocol.WPA);
+            netConfig.allowedKeyManagement
+                    .set(WifiConfiguration.KeyMgmt.WPA_PSK);
+            netConfig.allowedPairwiseCiphers
+                    .set(WifiConfiguration.PairwiseCipher.CCMP);
+            netConfig.allowedPairwiseCiphers
+                    .set(WifiConfiguration.PairwiseCipher.TKIP);
+            netConfig.allowedGroupCiphers
+                    .set(WifiConfiguration.GroupCipher.CCMP);
+            netConfig.allowedGroupCiphers
+                    .set(WifiConfiguration.GroupCipher.TKIP);
+
+            method.invoke(wifiManager, netConfig,true);
+            mConnectPrompttv.setText("热点成功开启！");
+            isopen = true;
         } catch (Exception e) {
-            return false;
+            Log.e("ooooooooo", "startWifiAp: "+e.getMessage());
+            mConnectPrompttv.setText("热点开启失败！");
+            isopen = false;
         }
     }
 
@@ -127,12 +158,14 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
     private void setConnectDevice(){
         String apSsid = name;
         String apPassword = pwd;
-        String apBssid = mWifiAdmin.getWifiConnectedBssid();
-        String taskResultCountStr = Integer.toString(1);
+        String apBssid = MacUtils.getMac();
+        String taskResultCountStr = Integer.toString(4);
         if (__IEsptouchTask.DEBUG) {
-            Log.d("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid
+            Log.d("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid+ " apBssid = "+apBssid
                     + ", " + " mEdtApPassword = " + apPassword);
         }
+        Log.d("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid +" apBssid = "+apBssid
+                + ", " + " mEdtApPassword = " + apPassword);
         new EsptouchAsyncTask3().execute(apSsid, apBssid, apPassword, taskResultCountStr);
     }
 
@@ -150,8 +183,10 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
             @Override
             public void run() {
                 String text = result.getBssid() + " is connected to the wifi";
-                Toast.makeText(DeviceInternetHotOkActivity.this, text,
+                Toast.makeText(DeviceInternetHotOkActivity.this, "配网成功",
                         Toast.LENGTH_LONG).show();
+                mConnectPrompttv.setText("连接成功");
+                setBackOnClick();
             }
 
         });
@@ -174,7 +209,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         protected void onPreExecute() {
             mProgressDialog = new ProgressDialog(DeviceInternetHotOkActivity.this);
             mProgressDialog
-                    .setMessage("Esptouch is configuring, please wait for a moment...");
+                    .setMessage("设备正在配网中，请稍等…");
             mProgressDialog.setCanceledOnTouchOutside(false);
             mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
@@ -190,7 +225,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                 }
             });
             mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE,
-                    "Waiting...", new DialogInterface.OnClickListener() {
+                    "等待...", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                         }
@@ -222,7 +257,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
             mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                     .setEnabled(true);
             mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(
-                    "Confirm");
+                    "确定");
             IEsptouchResult firstResult = result.get(0);
             // check whether the task is cancelled and no results received
             if (!firstResult.isCancelled()) {
@@ -250,11 +285,44 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                                 + " more result(s) without showing\n");
                     }
                     mConnectPrompttv.setText("连接成功");
-                    mProgressDialog.setMessage(sb.toString());
+                    mProgressDialog.setMessage("设备配网成功");
                 } else {
                     mConnectPrompttv.setText("连接失败");
-                    mProgressDialog.setMessage("Esptouch fail");
+                    mProgressDialog.setMessage("设备配网失败");
                 }
+            }
+        }
+    }
+
+    private void primissionAsk() {
+        Log.e("权限判断", "开始" );
+        if(
+                ContextCompat.checkSelfPermission(this, CHANGE_WIFI_MULTICAST_STATE) != PackageManager.PERMISSION_GRANTED||
+                        ContextCompat.checkSelfPermission(this, WRITE_SETTINGS) != PackageManager.PERMISSION_GRANTED||
+                        ContextCompat.checkSelfPermission(this, CHANGE_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED) {
+            //若果是第一次
+            new AlertDialog.Builder(this).setMessage("为了保证应用正常运行，需要内存卡访问权限以及位置信息获取权限！")
+                    .setPositiveButton("允许", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(DeviceInternetHotOkActivity.this, new String[]{
+                                    CHANGE_WIFI_MULTICAST_STATE,
+                                    WRITE_SETTINGS,
+                                    CHANGE_NETWORK_STATE}, 001);
+                        }
+                    }).show();
+        }
+    }
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode == 001) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    &&grantResults[1] == PackageManager.PERMISSION_GRANTED&&grantResults[2] == PackageManager.PERMISSION_GRANTED) {                                                                //(3)
+            } else {
+                ToastUtils.show(DeviceInternetHotOkActivity.this,"授权失败");
+                setBackOnClick();
+//                finish();
+//                //0表示正常退出，1表示异常退出
+//                System.exit(0);
             }
         }
     }

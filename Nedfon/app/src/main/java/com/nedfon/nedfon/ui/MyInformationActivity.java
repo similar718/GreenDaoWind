@@ -15,7 +15,7 @@ import android.widget.TextView;
 import com.nedfon.nedfon.R;
 import com.nedfon.nedfon.utils.StatusBarCompat;
 import com.nedfon.nedfon.view.SexChoicePopupWindow;
-import com.zaaach.citypicker.CityPickerActivity;
+import com.citypicker.CityPickerActivity;
 
 public class MyInformationActivity extends AppCompatActivity implements View.OnClickListener {
 

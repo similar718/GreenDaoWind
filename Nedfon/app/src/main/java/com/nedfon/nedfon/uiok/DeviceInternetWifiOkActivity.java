@@ -93,14 +93,16 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
     private EspWifiAdminSimple mWifiAdmin;
 
     private void setConnectDevice(){
-        String apSsid = WIFINAME;
+        String apSsid = WIFINAME.substring(1,WIFINAME.length()-1);
         String apPassword = mWifiPwdEt.getText().toString();
         String apBssid = mWifiAdmin.getWifiConnectedBssid();
-        String taskResultCountStr = Integer.toString(1);
+        String taskResultCountStr = Integer.toString(4);
         if (__IEsptouchTask.DEBUG) {
-            Log.d("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid
+            Log.e("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid+" apBssid = "+apBssid
                     + ", " + " mEdtApPassword = " + apPassword);
         }
+        Log.e("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid +" apBssid = "+apBssid
+                + ", " + " mEdtApPassword = " + apPassword);
         new EsptouchAsyncTask3().execute(apSsid, apBssid, apPassword, taskResultCountStr);
     }
 
@@ -118,8 +120,10 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
             @Override
             public void run() {
                 String text = result.getBssid() + " is connected to the wifi";
-                Toast.makeText(DeviceInternetWifiOkActivity.this, text,
+                Toast.makeText(DeviceInternetWifiOkActivity.this, "配网成功",
                         Toast.LENGTH_LONG).show();
+                mConnectPrompttv.setText("连接成功");
+                setBackOnClick();
             }
 
         });
@@ -142,7 +146,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
         protected void onPreExecute() {
             mProgressDialog = new ProgressDialog(DeviceInternetWifiOkActivity.this);
             mProgressDialog
-                    .setMessage("Esptouch is configuring, please wait for a moment...");
+                    .setMessage("设备正在配网中，请稍等…");
             mProgressDialog.setCanceledOnTouchOutside(false);
             mProgressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
                 @Override
@@ -158,7 +162,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
                 }
             });
             mProgressDialog.setButton(DialogInterface.BUTTON_POSITIVE,
-                    "Waiting...", new DialogInterface.OnClickListener() {
+                    "等待...", new DialogInterface.OnClickListener() {
                         @Override
                         public void onClick(DialogInterface dialog, int which) {
                         }
@@ -190,7 +194,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
             mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE)
                     .setEnabled(true);
             mProgressDialog.getButton(DialogInterface.BUTTON_POSITIVE).setText(
-                    "Confirm");
+                    "确定");
             IEsptouchResult firstResult = result.get(0);
             // check whether the task is cancelled and no results received
             if (!firstResult.isCancelled()) {
@@ -218,10 +222,12 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
                                 + " more result(s) without showing\n");
                     }
                     mConnectPrompttv.setText("连接成功");
-                    mProgressDialog.setMessage(sb.toString());
+                    mProgressDialog.setMessage("设备配网成功");
+//                    mProgressDialog.dismiss();
                 } else {
                     mConnectPrompttv.setText("连接失败");
-                    mProgressDialog.setMessage("Esptouch fail");
+                    mProgressDialog.setMessage("设备配网失败");
+//                    mProgressDialog.dismiss();
                 }
             }
         }

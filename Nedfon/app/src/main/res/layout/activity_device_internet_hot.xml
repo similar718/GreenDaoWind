@@ -59,12 +59,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_centerHorizontal="true"
-            android:text="连接成功！"
+            android:text="22222222"
             android:textColor="@color/green_txt_color"
             android:textSize="11sp"
             android:layout_above="@+id/activity_device_internet_wifi_connect_rl"
             android:layout_marginBottom="15dp"
-            android:visibility="gone"
             />
     </RelativeLayout>
 </LinearLayout>

@@ -89,7 +89,7 @@
                     android:layout_marginTop="2dp"
                     android:layout_gravity="center_horizontal"
                     android:textSize="12sp"
-                    android:text="设备绑定"/>
+                    android:text="设备列表"/>
             </LinearLayout>
             <LinearLayout
                 android:id="@+id/ll_personalcenter"

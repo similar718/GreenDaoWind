@@ -1,13 +1,20 @@
 package com.nedfon.nedfon.ui;
 
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Message;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.Html;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.widget.EditText;
@@ -38,6 +45,23 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
+import static android.Manifest.permission.ACCESS_FINE_LOCATION;
+import static android.Manifest.permission.ACCESS_LOCATION_EXTRA_COMMANDS;
+import static android.Manifest.permission.ACCESS_NETWORK_STATE;
+import static android.Manifest.permission.ACCESS_WIFI_STATE;
+import static android.Manifest.permission.BLUETOOTH;
+import static android.Manifest.permission.BLUETOOTH_ADMIN;
+import static android.Manifest.permission.CHANGE_NETWORK_STATE;
+import static android.Manifest.permission.CHANGE_WIFI_MULTICAST_STATE;
+import static android.Manifest.permission.CHANGE_WIFI_STATE;
+import static android.Manifest.permission.INTERNET;
+import static android.Manifest.permission.READ_EXTERNAL_STORAGE;
+import static android.Manifest.permission.READ_PHONE_STATE;
+import static android.Manifest.permission.VIBRATE;
+import static android.Manifest.permission.WRITE_EXTERNAL_STORAGE;
+import static android.Manifest.permission.WRITE_SETTINGS;
+
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private EditText mPhoneEt;
@@ -59,6 +83,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             StatusBarCompat.setStatusBardown5AndSetColor(LoginActivity.this,"#21D2B5");
         }
         setContentView(R.layout.activity_login);
+        primissionAsk();
         myDBHelper = new MyDBHelper(this);
         list = myDBHelper.query();
         if (list.size()!=0){
@@ -85,8 +110,73 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mPhoneEt.setText(list.get(0).phone);
             mPwdEt.setText(list.get(0).pwd);
         }
-
     }
+
+    private void primissionAsk() {
+        Log.e("权限判断", "开始" );
+        if(
+                ContextCompat.checkSelfPermission(this, CHANGE_WIFI_MULTICAST_STATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, WRITE_SETTINGS) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, CHANGE_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, BLUETOOTH) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, ACCESS_LOCATION_EXTRA_COMMANDS) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, READ_PHONE_STATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, INTERNET) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, CHANGE_WIFI_STATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, ACCESS_WIFI_STATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, ACCESS_NETWORK_STATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, VIBRATE) != PackageManager.PERMISSION_GRANTED||
+                ContextCompat.checkSelfPermission(this, ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            //若果是第一次
+            new AlertDialog.Builder(this).setMessage("为了保证应用正常运行，需要获取以下权限！")
+                    .setPositiveButton("允许", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialogInterface, int i) {
+                            ActivityCompat.requestPermissions(LoginActivity.this, new String[]{
+                                    WRITE_EXTERNAL_STORAGE,
+                                    CHANGE_WIFI_MULTICAST_STATE,
+                                    WRITE_SETTINGS,
+                                    CHANGE_NETWORK_STATE,
+                                    BLUETOOTH_ADMIN,
+                                    BLUETOOTH,
+                                    ACCESS_LOCATION_EXTRA_COMMANDS,
+                                    READ_PHONE_STATE,
+                                    INTERNET,
+                                    CHANGE_WIFI_STATE,
+                                    ACCESS_WIFI_STATE,
+                                    ACCESS_NETWORK_STATE,
+                                    ACCESS_COARSE_LOCATION,
+                                    READ_EXTERNAL_STORAGE,
+                                    VIBRATE,
+                                    ACCESS_FINE_LOCATION}, 001);
+                        }
+                    }).show();
+        } else {
+//            Intent intent = new Intent(this,MainActivity.class);
+//            startActivity(intent);
+//            finish();                                                                        //(2)
+        }
+    }
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        if(requestCode == 001) {
+            if(grantResults[0] == PackageManager.PERMISSION_GRANTED
+                    &&grantResults[1] == PackageManager.PERMISSION_GRANTED) {
+//                Intent intent = new Intent(this,MainActivity.class);
+//                startActivity(intent);
+//                finish();                                                                      //(3)
+            } else {
+                finish();                                                                    //（1）
+                //0表示正常退出，1表示异常退出
+                System.exit(0);
+            }
+        }
+    }
+
+
 
     private void startActivityToMain(DbDean bean, boolean flag){
         if (flag)
@@ -100,6 +190,10 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void startpage(String token){
         CommonUtils.token = token;
+        SharedPreferences sp = getSharedPreferences("nedfon",MODE_PRIVATE);
+        SharedPreferences.Editor edit = sp.edit();
+        edit.putString("token", token);
+        edit.commit();
         Intent main = new Intent(LoginActivity.this, DeviceBindOkActivity.class);
         startActivity(main);
         LoginActivity.this.finish();
@@ -167,7 +261,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                 } else if (res.equals("") || null == res) {
                     mHandler.sendEmptyMessage(2);
                 } else if (res.contains(":1,")){
-                    CommonUtils.mIsLogin = true;
                     mHandler.sendEmptyMessage(3);
                     LoginSuccess bean = new Gson().fromJson(res,LoginSuccess.class);
                     startActivityToMain(new DbDean(mPhoneEt.getText().toString(),mPwdEt.getText().toString(),bean.token, (System.currentTimeMillis()+(60*60*24*7))),true);
@@ -241,5 +334,13 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         }
     };
 
+    @Override
+    public boolean onKeyDown(int keyCode, KeyEvent event) {
+        return super.onKeyDown(keyCode, event);
+    }
 
+    @Override
+    public void onBackPressed() {
+        super.onBackPressed();
+    }
 }

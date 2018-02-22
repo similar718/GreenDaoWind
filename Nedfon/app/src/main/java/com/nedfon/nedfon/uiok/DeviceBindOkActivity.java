@@ -3,6 +3,7 @@ package com.nedfon.nedfon.uiok;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -59,6 +60,8 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
         NAME = DeviceBindOkActivity.class.getSimpleName();
         setImage(3);
         Log.e("oooooooooo", "onCreateView: token = "+ CommonUtils.token);
+        if (null == CommonUtils.token || "".equals(CommonUtils.token))
+            CommonUtils.token = getSharedPreferences("nedfon",MODE_PRIVATE).getString("token", "");
         doGetCurrentWeatherGet(CommonUtils.token);
     }
 
@@ -75,7 +78,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
         mList.clear();
         for (int i=0;i<mlistbean.data.size();i++){
             DeviceBindBean_test bean = new DeviceBindBean_test();
-            bean.name = mlistbean.data.get(i).terminal;
+            bean.name = mlistbean.data.get(i).deviceid;
             bean.online = mlistbean.data.get(i).commStatus==0?"离线":"在线";
             bean.wendu = mlistbean.data.get(i).intmp+"°";
             bean.shidu = mlistbean.data.get(i).insweet+"%";
@@ -110,6 +113,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             public void onClick(View v) {
                 Intent add = new Intent(DeviceBindOkActivity.this, AddDeviceOkActivity.class);
                 startActivity(add);
+                DeviceBindOkActivity.this.finish();
             }
         });
 
@@ -118,9 +122,15 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
                 if (mlistbean.data.get(position).commStatus==1){ //在线
+                    CommonUtils.bean = null;
                     CommonUtils.bean = mlistbean.data.get(position);
+                    SharedPreferences sp = getSharedPreferences("nedfon",MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sp.edit();
+                    editor.putString("deviceid",mlistbean.data.get(position).deviceid);
+                    editor.commit();
                     Intent intent = new Intent(DeviceBindOkActivity.this,DeviceOkActivity.class);
                     startActivity(intent);
+                    DeviceBindOkActivity.this.finish();
                 } else { //离线
                     DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
                         @Override
@@ -139,6 +149,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             ToastUtils.show(DeviceBindOkActivity.this, "当前属于连接WiFi状态");
             Intent wifi = new Intent(DeviceBindOkActivity.this, DeviceInternetWifiOkActivity.class);
             startActivity(wifi);
+            this.finish();
             return;
         } else if(type == 0) {
             ToastUtils.show(DeviceBindOkActivity.this, "当前网络不可用");//TODO 使用该软件需要连接网络
@@ -154,6 +165,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             ToastUtils.show(DeviceBindOkActivity.this, "3G网络 或者 2G网络");
             Intent hot = new Intent(DeviceBindOkActivity.this, DeviceInternetHotOkActivity.class);
             startActivity(hot);
+            this.finish();
         }else {
             ToastUtils.show(DeviceBindOkActivity.this,"当前不知道什么网络");
         }

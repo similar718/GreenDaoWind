@@ -119,6 +119,7 @@ public class AddDeviceOkActivity extends BaseTopBottomActivity implements View.O
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
                     DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
+                    CommonUtils.bean = null;
                     CommonUtils.bean = info.data;
                     mHandler.sendEmptyMessage(1);
                 } else if (res.contains(":0,")){
@@ -138,13 +139,14 @@ public class AddDeviceOkActivity extends BaseTopBottomActivity implements View.O
                     mSearchPromptTv.setText("成功搜索到！");
                     Intent intent = new Intent(AddDeviceOkActivity.this,AddDeviceInfoOkActivity.class);
                     startActivity(intent);
+                    AddDeviceOkActivity.this.finish();
                     break;
                 case 2 :
                     ToastUtils.show(AddDeviceOkActivity.this,"其他错误");
                     mSearchPromptTv.setText("其他错误");
                     break;
                 case 5 :
-                    ToastUtils.show(AddDeviceOkActivity.this,"设置失败");
+                    ToastUtils.show(AddDeviceOkActivity.this,"获取设备失败");
                     mSearchPromptTv.setText("搜索不到此设备，输入SN码有误！");
                     break;
             }
@@ -158,6 +160,8 @@ public class AddDeviceOkActivity extends BaseTopBottomActivity implements View.O
 
     @Override
     protected void setBackOnClick() {
+        Intent deviceIntent = new Intent(AddDeviceOkActivity.this,DeviceBindOkActivity.class);
+        startActivity(deviceIntent);
         AddDeviceOkActivity.this.finish();
     }
 }

@@ -1,5 +1,6 @@
 package com.nedfon.nedfon.uiok;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
@@ -47,6 +48,8 @@ public class AddDeviceInfoOkActivity extends BaseTopBottomActivity implements Vi
 
     @Override
     protected void setBackOnClick() {
+        Intent deviceIntent = new Intent(AddDeviceInfoOkActivity.this,AddDeviceOkActivity.class);
+        startActivity(deviceIntent);
         this.finish();
     }
     private void initView() {
@@ -64,7 +67,7 @@ public class AddDeviceInfoOkActivity extends BaseTopBottomActivity implements Vi
     }
 
     private void initData() {
-        mSNTv.setText(info.sn);
+        mSNTv.setText(info.deviceid);
         mTypeTv .setText(info.terminal);
         mAddressTv.setText(info.location);
         mDateTv.setText(info.clienttime);
@@ -76,7 +79,7 @@ public class AddDeviceInfoOkActivity extends BaseTopBottomActivity implements Vi
         switch (v.getId()){
 
             case R.id.activity_add_device_info_bind_rl:
-                doBindingDeviceGet(CommonUtils.token,info.sn);
+                doBindingDeviceGet(CommonUtils.token,info.deviceid);
                 break;
 
             default:
@@ -109,6 +112,7 @@ public class AddDeviceInfoOkActivity extends BaseTopBottomActivity implements Vi
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
                     DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
+                    CommonUtils.bean = null;
                     CommonUtils.bean = info.data;
                     mHandler.sendEmptyMessage(1);
                 } else if (res.contains(":-1,")){

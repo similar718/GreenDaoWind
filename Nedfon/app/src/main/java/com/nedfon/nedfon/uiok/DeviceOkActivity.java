@@ -65,13 +65,13 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     @Override
     protected void onStart() {
         super.onStart();
-//        doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.sn);
+        doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.deviceid);
     }
 
     @Override
     protected void onRestart() {
         super.onRestart();
-//        doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.sn);
+        doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.deviceid);
     }
 
     @Override
@@ -81,6 +81,8 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
     @Override
     protected void setBackOnClick() {
+        Intent deviceIntent = new Intent(DeviceOkActivity.this,DeviceBindOkActivity.class);
+        startActivity(deviceIntent);
         DeviceOkActivity.this.finish();
     }
 
@@ -120,24 +122,47 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         initData();
     }
 
-    @SuppressLint("SetTextI18n")
     private void initData() {
+        Log.e("oooooooooo", "onCreateView: token = "+ getSharedPreferences("nedfon",MODE_PRIVATE).getString("token", ""));
+        if (null == CommonUtils.bean){
+            if (null == CommonUtils.token || "".equals(CommonUtils.token))
+                CommonUtils.token = getSharedPreferences("nedfon",MODE_PRIVATE).getString("token", "");
+            doDeviceInfoGet(CommonUtils.token,getSharedPreferences("nedfon",MODE_PRIVATE).getString("deviceid", ""));
+            return;
+        }
         info = CommonUtils.bean;
+        if (info.status!=0){
+            ToastUtils.show(DeviceOkActivity.this,"设备异常");
+        }
+        Log.e("oooooooooo","deviceid = "+info.deviceid);
+        ToastUtils.show(DeviceOkActivity.this,info.deviceid);
         mTemperatureTv.setText(info.outtmp+"℃");
         mHumidityTv.setText(info.outsweet+"%");
         mPm25Tv.setText(info.outpm25+"");
-        mWuRanTxtTv.setText("室内轻度污染");
+
+        if ((info.inpm25/2)<=25){
+            mWuRanTxtTv.setText("干净");
+        } else if ((info.inpm25/2)<=75 && (info.inpm25/2)>25){
+            mWuRanTxtTv.setText("轻度污染");
+        } else if ((info.inpm25/2)<=100 && (info.inpm25/2)>75){
+            mWuRanTxtTv.setText("中度污染");
+        } else if ((info.inpm25/2)>100){
+            mWuRanTxtTv.setText("重度污染");
+        }
         mBigTemperatureTv.setText(((int)info.intmp)+"°");
         mShiduBigTv.setText(((int)info.insweet)+"%");
         mPm25BigTv.setText(((int)info.inpm25)+"");
-        //电源否开关
+        //负离子否开关
         fulizi = info.ionsflag;
-        auto = info.workmodel;
-        power = info.status;
+        //排气换气是否自动 0 自动 1 手动
+        auto = info.changeOrPushModel;
+        //电源开关获取 0 关机 1 开机
+//        power = info.windstatus;
+        power = info.workmodel;
 
 
         //排气换气自动 手动
-        boolean paiqihuanqiisopen = info.workmodel==0?false:true; //0自动 1手动
+        boolean paiqihuanqiisopen = auto ==0?false:true; //0自动 1手动
         if (paiqihuanqiisopen){
             mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
             mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
@@ -147,7 +172,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         }
         //负离子开关
         boolean fuliziisopen = info.ionsflag==0?false:true;
-        if (!fuliziisopen){
+        if (fuliziisopen){
             mFuliziKai.setVisibility(View.VISIBLE);
             mFuliziGuan.setVisibility(View.GONE);
         } else {
@@ -156,7 +181,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         }
         //电源开关
         boolean poweropen = power ==0?false:true;
-        if (!poweropen){
+        if (poweropen){
             mFengjiPowerKai.setVisibility(View.VISIBLE);
             mFengjiPowerGuan.setVisibility(View.GONE);
         } else {
@@ -165,82 +190,95 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         }
     }
 
+    private boolean mIsPower = false;
+    private boolean mIsIonsFlag = false;
+    private boolean mIsAuto = false;
+
     @Override
     public void onClick(View v) {
         switch (v.getId()){
             case R.id.activity_exhaust_ventilation_rl:
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机处于关机状态，不能进行设置参数！");
+                    return;
+                }
+                if (auto == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"排气换气处于自动模式，不能进行设置参数！");
+                    return;
+                }
                 info.ionsflag = fulizi;
-                info.workmodel = auto;
-                info.status = power;
+                info.changeOrPushModel = auto;
+//                info.windstatus = power;
+                info.workmodel = power;
+                CommonUtils.bean = null;
                 CommonUtils.bean = info;
                 Intent exhaustintent = new Intent(DeviceOkActivity.this,ExhaustVentilatorOkActivity.class);
                 startActivity(exhaustintent);
+                DeviceOkActivity.this.finish();
                 break;
             case R.id.activity_param_set_rl:
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    return;
+                }
                 info.ionsflag = fulizi;
-                info.workmodel = auto;
-                info.status = power;
+                info.changeOrPushModel = auto;
+//                info.windstatus = power;
+                info.workmodel = power;
+                CommonUtils.bean = null;
                 CommonUtils.bean = info;
                 Intent paramtintent = new Intent(DeviceOkActivity.this,ParamsSettingOkActivity.class);
                 startActivity(paramtintent);
+                DeviceOkActivity.this.finish();
                 break;
             case R.id.activity_timer_set_rl:
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    return;
+                }
                 info.ionsflag = fulizi;
-                info.workmodel = auto;
-                info.status = power;
+                info.changeOrPushModel = auto;
+//                info.windstatus = power;
+                info.workmodel = power;
+                CommonUtils.bean = null;
                 CommonUtils.bean = info;
                 Intent timerintent = new Intent(DeviceOkActivity.this,TimerSettingOkActivity.class);
                 startActivity(timerintent);
+                DeviceOkActivity.this.finish();
                 break;
             case R.id.fulizi_bottom_rl:
-                if (mFuliziKai.getVisibility() == View.GONE){
-                    mFuliziKai.setVisibility(View.VISIBLE);
-                    mFuliziGuan.setVisibility(View.GONE);
-                    fulizi = 1;
-                    doControlWindCmdGet(CommonUtils.token,info.sn,auto+"",
-                            "1","1",fulizi+"","1",power+"");
-                } else {
-                    mFuliziKai.setVisibility(View.GONE);
-                    mFuliziGuan.setVisibility(View.VISIBLE);
-                    fulizi = 0;
-                    doControlWindCmdGet(CommonUtils.token,info.sn,auto+"",
-                            "1","1",fulizi+"","1",power+"");
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    return;
                 }
+                mIsIonsFlag = true;
+                mIsPower = false;
+                mIsAuto = false;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,(auto==0?1:0)+"",
+                        "1","1",(fulizi==0?1:0)+"","1",(power==0?1:0)+"");
                 break;
             case R.id.paiqi_huanqi_bottom_rl:
-                if (mPaiqiHaunqiAuto.getVisibility() == View.GONE){
-                    mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
-                    mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
-                    auto = 0;
-                    doControlWindCmdGet(CommonUtils.token,info.sn,auto+"",
-                            "1","1",fulizi+"","1",power+"");
-                } else {
-                    auto = 1;
-                    mPaiqiHaunqiAuto.setVisibility(View.GONE);
-                    mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    return;
                 }
+                mIsIonsFlag = false;
+                mIsPower = false;
+                mIsAuto = true;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        "1","1",fulizi+"","1",power+"");
                 break;
             case R.id.fengji_power_rl:
-                if (mFengjiPowerKai.getVisibility() == View.GONE){
-                    mFengjiPowerKai.setVisibility(View.VISIBLE);
-                    mFengjiPowerGuan.setVisibility(View.GONE);
-                    power = 1;
-                    doControlWindCmdGet(CommonUtils.token,info.sn,auto+"",
-                            "1","1",fulizi+"","1",power+"");
-                } else {
-                    mFengjiPowerKai.setVisibility(View.GONE);
-                    mFengjiPowerGuan.setVisibility(View.VISIBLE);
-                    power = 0;
-                    doControlWindCmdGet(CommonUtils.token,info.sn,auto+"",
-                            "1","1",fulizi+"","1",power+"");
-                }
+                mIsIonsFlag = false;
+                mIsPower = false;
+                mIsAuto = true;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        "1","1",fulizi+"","1",power+"");
                 break;
             default:
                 break;
         }
     }
-
-
 
     private void doDeviceInfoGet(String token,String deviceSN){
         //1.拿到OkHttpClient对象
@@ -266,6 +304,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
                     DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
+                    CommonUtils.bean = null;
                     CommonUtils.bean = info.data;
                     mHandler.sendEmptyMessage(3);
                 } else if (res.contains(":0,")){
@@ -276,9 +315,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
             }
         });
     }
-
-
-
 
     private static OkHttpClient okhttpclient = new OkHttpClient();
     /*
@@ -341,12 +377,43 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
             switch (msg.what){
                 case 1:
                     ToastUtils.show(DeviceOkActivity.this,"设置成功！");
+                    if (mIsAuto){
+                        if (mPaiqiHaunqiAuto.getVisibility() == View.GONE){
+                            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
+                            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+                            auto = 0;
+                        } else {
+                            auto = 1;
+                            mPaiqiHaunqiAuto.setVisibility(View.GONE);
+                            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+                        }
+                    } else if(mIsIonsFlag){
+                        if (mFuliziKai.getVisibility() == View.GONE){
+                            mFuliziKai.setVisibility(View.VISIBLE);
+                            mFuliziGuan.setVisibility(View.GONE);
+                            fulizi = 1;
+                        } else {
+                            mFuliziKai.setVisibility(View.GONE);
+                            mFuliziGuan.setVisibility(View.VISIBLE);
+                            fulizi = 0;
+                        }
+                    } else if(mIsPower){
+                        if (mFengjiPowerKai.getVisibility() == View.GONE){
+                            mFengjiPowerKai.setVisibility(View.VISIBLE);
+                            mFengjiPowerGuan.setVisibility(View.GONE);
+                            power = 1;
+                        } else {
+                            mFengjiPowerKai.setVisibility(View.GONE);
+                            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+                            power = 0;
+                        }
+                    }
                     break;
                 case 2 :
                     ToastUtils.show(DeviceOkActivity.this,"其他错误");
                     break;
                 case 3 :
-                    ToastUtils.show(DeviceOkActivity.this,"获取成功");
+//                    ToastUtils.show(DeviceOkActivity.this,"获取成功");
                     initData();
                     break;
                 case 5 :

@@ -1,10 +1,10 @@
 package com.nedfon.nedfon.uiok;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
-import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -14,7 +14,6 @@ import android.widget.TextView;
 
 import com.nedfon.nedfon.R;
 import com.nedfon.nedfon.bean.DeviceInfo;
-//import com.nedfon.nedfon.ui.TimerSettingActivity;
 import com.nedfon.nedfon.bean.Entity;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
@@ -44,17 +43,20 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
     private TimerChoiceDialog mDialog;
 
     private int week = Entity.Mon;;
+    private int num = 0;
+    private int mnum = 0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
 
         NAME = DeviceOkActivity.class.getSimpleName();
         setImage(3);
         setTitleText("定时设置");
 
         info = CommonUtils.bean;
+//        Log.e("oooooooooo","deviceid = "+info.deviceid);
+//        ToastUtils.show(TimerSettingOkActivity.this,info.deviceid);
         initView();
     }
 
@@ -65,6 +67,8 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
 
     @Override
     protected void setBackOnClick() {
+        Intent deviceIntent = new Intent(TimerSettingOkActivity.this,DeviceOkActivity.class);
+        startActivity(deviceIntent);
         this.finish();
     }
 
@@ -107,6 +111,66 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
     private void initData() {
         mStartTv.setText(info.opentime);
         mEndTv.setText(info.closetime);
+
+        num = info.settime;
+        mnum = num;
+
+        int a = num&1;
+        if (a==1){
+            mWeekOneTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekOneTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekOneTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekOneTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
+        int a1 = num&2;
+        if (a1==2){
+            mWeekTwoTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekTwoTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekTwoTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekTwoTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
+        int a2 = num&4;
+        if (a2==4){
+            mWeekThreeTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekThreeTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekThreeTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekThreeTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
+        int a3 = num&8;
+        if (a3==8){
+            mWeekFourTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekFourTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekFourTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekFourTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
+        int a4 = num&16;
+        if (a4==16){
+            mWeekFiveTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekFiveTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekFiveTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekFiveTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
+        int a5 = num&32;
+        if (a5==32){
+            mWeekSixTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekSixTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekSixTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekSixTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
+        int a6 = num&64;
+        if (a6 == 64){
+            mWeekSevenTv.setBackgroundResource(R.drawable.week_selected_bg);
+            mWeekSevenTv.setTextColor(Color.parseColor("#ffffff"));
+        } else {
+            mWeekSevenTv.setBackgroundResource(R.drawable.week_unselect_bg);
+            mWeekSevenTv.setTextColor(Color.parseColor("#b9b9b9"));
+        }
     }
 
     @SuppressLint("ResourceAsColor")
@@ -115,7 +179,7 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
         switch (v.getId()){
             case R.id.activity_timer_setting_sure_rl: //确定
                 if (mIsSelected) {
-                    doControlTimerCmdGet(CommonUtils.token,mStartTv.getText().toString(),mEndTv.getText().toString(),week+"",info.sn);
+                    doControlTimerCmdGet(CommonUtils.token,mStartTv.getText().toString(),mEndTv.getText().toString(),num+"",info.deviceid);
                     mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
                     mSureIv.setImageResource(R.drawable.sure_selected_gou);
                 }
@@ -146,52 +210,87 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
                 break;
 
             case R.id.activity_timer_setting_week_one_tv:
-                week = Entity.Mon;
-                chooseWeekDefault();
-                mWeekOneTv.setTextColor(Color.parseColor("#ffffff"));
-                mWeekOneTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&1)!=1){
+                    num = num+1;
+                    mWeekOneTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekOneTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-1;
+                    mWeekOneTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekOneTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
             case R.id.activity_timer_setting_week_two_tv:
-                week = Entity.Tus;
-                chooseWeekDefault();
-                mWeekTwoTv.setTextColor(Color.parseColor("#ffffff"));
-                mWeekTwoTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&2)!=2){
+                    num = num+2;
+                    mWeekTwoTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekTwoTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-2;
+                    mWeekTwoTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekTwoTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
             case R.id.activity_timer_setting_week_three_tv:
-                week = Entity.Wen;
-                chooseWeekDefault();
-                mWeekThreeTv.setTextColor(Color.parseColor("#ffffff"));
-                mWeekThreeTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&4)!=4){
+                    num = num+4;
+                    mWeekThreeTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekThreeTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-4;
+                    mWeekThreeTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekThreeTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
             case R.id.activity_timer_setting_week_four_tv:
-                week = Entity.Thu;
-                chooseWeekDefault();
-                mWeekFourTv.setTextColor(Color.parseColor("#ffffff") );
-                mWeekFourTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&8)!=8){
+                    num = num+8;
+                    mWeekFourTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekFourTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-8;
+                    mWeekFourTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekFourTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
             case R.id.activity_timer_setting_week_five_tv:
-                week = Entity.Fri;
-                chooseWeekDefault();
-                mWeekFiveTv.setTextColor(Color.parseColor("#ffffff"));
-                mWeekFiveTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&16)!=16){
+                    num = num+16;
+                    mWeekFiveTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekFiveTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-16;
+                    mWeekFiveTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekFiveTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
             case R.id.activity_timer_setting_week_six_tv:
-                week = Entity.Sat;
-                chooseWeekDefault();
-                mWeekSixTv.setTextColor(Color.parseColor("#ffffff"));
-                mWeekSixTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&32)!=32){
+                    num = num+32;
+                    mWeekSixTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekSixTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-32;
+                    mWeekSixTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekSixTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
             case R.id.activity_timer_setting_week_seven_tv:
-                week = Entity.sun;
-                chooseWeekDefault();
-                mWeekSevenTv.setTextColor(Color.parseColor("#ffffff"));
-                mWeekSevenTv.setBackgroundResource(R.drawable.week_selected_bg);
+                if ((num&64)!=64){
+                    num = num+64;
+                    mWeekSevenTv.setBackgroundResource(R.drawable.week_selected_bg);
+                    mWeekSevenTv.setTextColor(Color.parseColor("#ffffff"));
+                } else {
+                    num = num-64;
+                    mWeekSevenTv.setBackgroundResource(R.drawable.week_unselect_bg);
+                    mWeekSevenTv.setTextColor(Color.parseColor("#b9b9b9"));
+                }
                 setSureBtn();
                 break;
 
@@ -200,7 +299,7 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
         }
     }
     private void setSureBtn(){
-        if ( info.opentime == mStartTv.getText().toString() && info.closetime == mEndTv.getText().toString() && week == 1){
+        if ( info.opentime == mStartTv.getText().toString() && info.closetime == mEndTv.getText().toString() && num == mnum){
             mIsSelected = false;
             mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
             mSureIv.setImageResource(R.drawable.sure_selected_gou);
@@ -214,16 +313,16 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
 
     private static OkHttpClient okhttpclient = new OkHttpClient();
 
-    private void doControlTimerCmdGet(String token,String opentime,String closetime,String setting,String deviceSN){
+    private void doControlTimerCmdGet(String token,String opentime,String closetime,String settime,String deviceSN){
         //1.拿到OkHttpClient对象
         FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         //controlTimerCmd?token=abcvTkdjsd_1209990ijhyty&deviceSN=12345678&opentime=08:30&closetime=23:30&setting=31
-        String url = CommonUtils.localhost+"mobileapi/controlTimerCmd?token="+token+"&deviceSN="+deviceSN+"&opentime="+opentime+"&closetime="+closetime+"&setting="+setting+"&settime=1";
+        String url = CommonUtils.localhost+"mobileapi/controlTimerCmd?token="+token+"&deviceSN="+deviceSN+"&opentime="+opentime+"&closetime="+closetime+"&settime="+settime;
         Log.e("ooooooooooooo", "doControlTimerCmdGet: url = "+url );
         //settime 1启用定时操作  0未启用定时操作
-        Request request = builder.url(CommonUtils.localhost+"mobileapi/controlTimerCmd?token="+token+"&deviceSN="+deviceSN+"&opentime="+opentime+"&closetime="+closetime+"&setting="+setting+"&settime=1").get().build();
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/controlTimerCmd?token="+token+"&deviceSN="+deviceSN+"&opentime="+opentime+"&closetime="+closetime+"&settime="+settime).get().build();
         executeControlTimerCmdRequest(request);
     }
 

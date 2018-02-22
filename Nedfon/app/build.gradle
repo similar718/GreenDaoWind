@@ -27,7 +27,6 @@ dependencies {
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
     implementation 'com.google.code.gson:gson:2.2.4'
     implementation 'com.squareup.okhttp:okhttp:2.0.0'
-    implementation project(':citypickers')
     implementation 'cn.bingoogolapple:bga-qrcode-zxing:1.2.1'
     implementation 'cn.bingoogolapple:bga-photopicker:1.2.8@aar'
     implementation files('libs/AMap_Location_V3.5.0_20170731.jar')

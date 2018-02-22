@@ -90,6 +90,7 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
                 }
                 Intent deviceBind = new Intent(BaseBottomActivity.this,PersonalCenterOkActivity.class);
                 startActivity(deviceBind);
+                BaseBottomActivity.this.finish();
             }
         });
 
@@ -123,6 +124,7 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
             ToastUtils.show(BaseBottomActivity.this, "当前属于连接WiFi状态");
             Intent wifi = new Intent(BaseBottomActivity.this, DeviceInternetWifiOkActivity.class);
             startActivity(wifi);
+            BaseBottomActivity.this.finish();
             return;
         } else if(type == 0) {
             ToastUtils.show(BaseBottomActivity.this, "当前网络不可用");//TODO 使用该软件需要连接网络
@@ -138,6 +140,7 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
             ToastUtils.show(BaseBottomActivity.this, "3G网络 或者 2G网络");
             Intent hot = new Intent(BaseBottomActivity.this, DeviceInternetHotOkActivity.class);
             startActivity(hot);
+            BaseBottomActivity.this.finish();
         }else {
             ToastUtils.show(BaseBottomActivity.this,"当前不知道什么网络");
         }

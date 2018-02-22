@@ -107,7 +107,7 @@
                 android:background="@drawable/set_param_alarm_bg"
                 android:layout_centerInParent="true"
                 >
-                <ImageView
+                <com.nedfon.nedfon.view.LongClickButton
                     android:id="@+id/activity_params_setting_teperature_add_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -115,7 +115,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     />
-                <ImageView
+                <com.nedfon.nedfon.view.LongClickButton
                     android:id="@+id/activity_params_setting_teperature_reduce_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -181,7 +181,7 @@
                 android:background="@drawable/set_param_alarm_bg"
                 android:layout_centerInParent="true"
                 >
-                <ImageView
+                <com.nedfon.nedfon.view.LongClickButton
                     android:id="@+id/activity_params_setting_humidity_add_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -189,7 +189,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     />
-                <ImageView
+                <com.nedfon.nedfon.view.LongClickButton
                     android:id="@+id/activity_params_setting_humidity_reduce_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -256,7 +256,7 @@
                 android:background="@drawable/set_param_alarm_bg"
                 android:layout_centerInParent="true"
                 >
-                <ImageView
+                <com.nedfon.nedfon.view.LongClickButton
                     android:id="@+id/activity_params_setting_pm25_add_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -264,7 +264,7 @@
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     />
-                <ImageView
+                <com.nedfon.nedfon.view.LongClickButton
                     android:id="@+id/activity_params_setting_pm25_reduce_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"

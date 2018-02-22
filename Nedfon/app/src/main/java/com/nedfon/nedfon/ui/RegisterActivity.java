@@ -37,11 +37,11 @@ import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.RequestBody;
 import com.squareup.okhttp.Response;
-import com.zaaach.citypicker.CheckPermissionsListener;
-import com.zaaach.citypicker.CityPickerActivity;
-import com.zaaach.citypicker.model.LocateState;
-import com.zaaach.citypicker.utils.GetLocation;
-import com.zaaach.citypicker.utils.StringUtils;
+import com.citypicker.CheckPermissionsListener;
+import com.citypicker.CityPickerActivity;
+import com.citypicker.model.LocateState;
+import com.citypicker.utils.GetLocation;
+import com.citypicker.utils.StringUtils;
 
 import java.io.IOException;
 import java.util.ArrayList;

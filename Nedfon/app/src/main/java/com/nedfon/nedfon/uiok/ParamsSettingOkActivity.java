@@ -1,5 +1,6 @@
 package com.nedfon.nedfon.uiok;
 
+import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
@@ -13,6 +14,7 @@ import com.nedfon.nedfon.R;
 import com.nedfon.nedfon.bean.DeviceInfo;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
+import com.nedfon.nedfon.view.LongClickButton;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
@@ -22,14 +24,17 @@ import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 
-public class ParamsSettingOkActivity extends BaseTopBottomActivity implements View.OnClickListener {
-    private ImageView mTemperatureAddIv,mTemperatureReduceIv;
+public class ParamsSettingOkActivity extends BaseTopBottomActivity implements View.OnClickListener{
+//    private ImageView mTemperatureAddIv,mTemperatureReduceIv;
+    private LongClickButton mTemperatureAddIv,mTemperatureReduceIv;
     private TextView mTemperatureTv;
 
-    private ImageView mHumidityAddIv,mHumidityReduceIv;
+//    private ImageView mHumidityAddIv,mHumidityReduceIv;
+    private LongClickButton mHumidityAddIv,mHumidityReduceIv;
     private TextView mHumidityTv;
 
-    private ImageView mPm25AddIv,mPm25ReduceIv;
+//    private ImageView mPm25AddIv,mPm25ReduceIv;
+    private LongClickButton mPm25AddIv,mPm25ReduceIv;
     private TextView mPm25Tv;
 
     private RelativeLayout mSureRl;
@@ -55,6 +60,8 @@ public class ParamsSettingOkActivity extends BaseTopBottomActivity implements Vi
         setImage(3);
         setTitleText("参数设置");
         info = CommonUtils.bean;
+//        Log.e("oooooooooo","deviceid = "+info.deviceid);
+//        ToastUtils.show(ParamsSettingOkActivity.this,info.deviceid);
         initView();
     }
 
@@ -65,6 +72,8 @@ public class ParamsSettingOkActivity extends BaseTopBottomActivity implements Vi
 
     @Override
     protected void setBackOnClick() {
+        Intent deviceIntent = new Intent(ParamsSettingOkActivity.this,DeviceOkActivity.class);
+        startActivity(deviceIntent);
         this.finish();
     }
 
@@ -86,14 +95,111 @@ public class ParamsSettingOkActivity extends BaseTopBottomActivity implements Vi
 
         mSureRl.setOnClickListener(this);
 
-        mTemperatureAddIv.setOnClickListener(this);
-        mTemperatureReduceIv.setOnClickListener(this);
-        mHumidityAddIv.setOnClickListener(this);
-        mHumidityReduceIv.setOnClickListener(this);
-        mPm25AddIv.setOnClickListener(this);
-        mPm25ReduceIv.setOnClickListener(this);
+//        mTemperatureAddIv.setOnClickListener(this);
+//        mTemperatureReduceIv.setOnClickListener(this);
+//        mHumidityAddIv.setOnClickListener(this);
+//        mHumidityReduceIv.setOnClickListener(this);
+//        mPm25AddIv.setOnClickListener(this);
+//        mPm25ReduceIv.setOnClickListener(this);
 
         initData();
+        initClick();
+    }
+
+    private void initClick() {
+        //温度连续加
+        mTemperatureAddIv.setlongclickrepeatlistener(new LongClickButton.longclickrepeatlistener() {
+            @Override
+            public void repeataction() {
+                addTemperature();
+            }
+        }, 50);
+        //温度连续减
+        mTemperatureReduceIv.setlongclickrepeatlistener(new LongClickButton.longclickrepeatlistener() {
+            @Override
+            public void repeataction() {
+                reduceTemperature();
+            }
+        }, 50);
+
+        //温度加1
+        mTemperatureAddIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addTemperature();
+            }
+        });
+        //温度减1
+        mTemperatureReduceIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reduceTemperature();
+            }
+        });
+
+
+
+        //湿度连续加
+        mHumidityAddIv.setlongclickrepeatlistener(new LongClickButton.longclickrepeatlistener() {
+            @Override
+            public void repeataction() {
+                addHumidity();
+            }
+        }, 50);
+        //湿度连续减
+        mHumidityReduceIv.setlongclickrepeatlistener(new LongClickButton.longclickrepeatlistener() {
+            @Override
+            public void repeataction() {
+                reduceHumidity();
+            }
+        }, 50);
+
+        //湿度加1
+        mHumidityAddIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addHumidity();
+            }
+        });
+        //湿度减1
+        mHumidityReduceIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reduceHumidity();
+            }
+        });
+
+
+
+        //Pm25连续加
+        mPm25AddIv.setlongclickrepeatlistener(new LongClickButton.longclickrepeatlistener() {
+            @Override
+            public void repeataction() {
+                addPm25();
+            }
+        }, 50);
+        //Pm25连续减
+        mPm25ReduceIv.setlongclickrepeatlistener(new LongClickButton.longclickrepeatlistener() {
+            @Override
+            public void repeataction() {
+                reducePm25();
+            }
+        }, 50);
+
+        //Pm25加1
+        mPm25AddIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                addPm25();
+            }
+        });
+        //Pm25减1
+        mPm25ReduceIv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                reducePm25();
+            }
+        });
     }
 
     private void initData() {
@@ -117,106 +223,89 @@ public class ParamsSettingOkActivity extends BaseTopBottomActivity implements Vi
                 if (mIsSelected) {
                     mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
                     mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                    doControlThresholdCmdGet(CommonUtils.token,info.sn,mtemperature+"",mhumidity+"",mpm25+"");
+                    doControlThresholdCmdGet(CommonUtils.token,info.deviceid,mtemperature+"",mhumidity+"",mpm25+"");
                 }
                 break;
 
             case R.id.activity_params_setting_teperature_add_iv: //温度报警 add
-                mtemperature++;
-                mTemperatureTv.setText(mtemperature+"℃");
-                if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
-                    mIsSelected = false;
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                } else {
-                    mIsSelected = true;
-                    mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
-                    mSureIv.setImageResource(R.drawable.sure_unselect_gou);
-                }
+                addTemperature();
                 break;
 
             case R.id.activity_params_setting_teperature_reduce_iv: //温度报警 reduce
-                if (mtemperature == 0){
-                    return;
-                }
-                mtemperature--;
-                mTemperatureTv.setText(mtemperature+"℃");
-                if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
-                    mIsSelected = false;
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                } else {
-                    mIsSelected = true;
-                    mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
-                    mSureIv.setImageResource(R.drawable.sure_unselect_gou);
-                }
+                reduceTemperature();
                 break;
 
             case R.id.activity_params_setting_humidity_add_iv: //湿度报警 add
-                if (mhumidity == 100){
-                    return;
-                }
-                mhumidity ++;
-                mHumidityTv.setText(mhumidity+"%");
-                if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
-                    mIsSelected = false;
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                } else {
-                    mIsSelected = true;
-                    mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
-                    mSureIv.setImageResource(R.drawable.sure_unselect_gou);
-                }
+                addHumidity();
                 break;
 
             case R.id.activity_params_setting_humidity_reduce_iv: //湿度报警 reduce
-                if (mhumidity == 0){
-                    return;
-                }
-                mhumidity --;
-                if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
-                    mIsSelected = false;
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                } else {
-                    mIsSelected = true;
-                    mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
-                    mSureIv.setImageResource(R.drawable.sure_unselect_gou);
-                }
+                reduceHumidity();
                 break;
 
             case R.id.activity_params_setting_pm25_add_iv: //pm2.5报警 add
-                mpm25 ++;
-                mPm25Tv.setText(mpm25+"");
-                if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
-                    mIsSelected = false;
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                } else {
-                    mIsSelected = true;
-                    mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
-                    mSureIv.setImageResource(R.drawable.sure_unselect_gou);
-                }
+                addPm25();
                 break;
 
             case R.id.activity_params_setting_pm25_reduce_iv: //pm2.5报警 reduce
-                if (mpm25 == 0){
-                    return;
-                }
-                mpm25 --;
-                mPm25Tv.setText(mpm25+"");
-                if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
-                    mIsSelected = false;
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                } else {
-                    mIsSelected = true;
-                    mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
-                    mSureIv.setImageResource(R.drawable.sure_unselect_gou);
-                }
+                reducePm25();
                 break;
             default:
                 break;
+        }
+    }
+
+    private void addTemperature(){
+        mtemperature++;
+        mTemperatureTv.setText(mtemperature+"℃");
+        sureIsShow();
+    }
+    private void reduceTemperature(){
+        if (mtemperature == 0){
+            return;
+        }
+        mtemperature--;
+        mTemperatureTv.setText(mtemperature+"℃");
+        sureIsShow();
+    }
+    private void addHumidity(){
+        if (mhumidity == 100){
+            return;
+        }
+        mhumidity ++;
+        mHumidityTv.setText(mhumidity+"%");
+        sureIsShow();
+    }
+    private void reduceHumidity(){
+        if (mhumidity == 0){
+            return;
+        }
+        mhumidity --;
+        mHumidityTv.setText(mhumidity+"%");
+        sureIsShow();
+    }
+    private void addPm25(){
+        mpm25 ++;
+        mPm25Tv.setText(mpm25+"");
+        sureIsShow();
+    }
+    private void reducePm25(){
+        if (mpm25 == 0){
+            return;
+        }
+        mpm25 --;
+        mPm25Tv.setText(mpm25+"");
+        sureIsShow();
+    }
+    private void sureIsShow(){
+        if (mtemperature == temperature && mpm25 == pm25 && mhumidity == humidity){
+            mIsSelected = false;
+            mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
+            mSureIv.setImageResource(R.drawable.sure_selected_gou);
+        } else {
+            mIsSelected = true;
+            mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
+            mSureIv.setImageResource(R.drawable.sure_unselect_gou);
         }
     }
 

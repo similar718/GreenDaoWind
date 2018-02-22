@@ -12,10 +12,8 @@ import android.widget.PopupWindow;
 import android.widget.TextView;
 
 import com.nedfon.nedfon.R;
-import com.nedfon.nedfon.ui.MyInformationActivity;
-import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.view.SexChoicePopupWindow;
-import com.zaaach.citypicker.CityPickerActivity;
+import com.citypicker.CityPickerActivity;
 
 public class MyInformationOkActivity extends BaseBottomActivity implements View.OnClickListener {
 
