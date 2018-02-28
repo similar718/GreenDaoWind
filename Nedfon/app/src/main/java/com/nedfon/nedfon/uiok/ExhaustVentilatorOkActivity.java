@@ -117,8 +117,8 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
                 if (mIsSelected) {
                     mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
                     mSureIv.setImageResource(R.drawable.sure_selected_gou);
-                    doControlWindCmdGet(CommonUtils.token,info.deviceid,info.ionsflag+"",
-                            isdi+"","1",info.workmodel+"","1",info.status+"");
+                    doControlWindCmdGet(CommonUtils.token,info.deviceid,info.changeOrPushModel+"",
+                            isdi+"",info.workmodel+"",info.ionsflag+"","1",info.workmodel+"");
                 }
                 break;
             default:

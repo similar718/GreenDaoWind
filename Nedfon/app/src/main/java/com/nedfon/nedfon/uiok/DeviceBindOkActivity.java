@@ -132,7 +132,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                     startActivity(intent);
                     DeviceBindOkActivity.this.finish();
                 } else { //离线
-                    DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
+                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
                             isWIFIOrOther();

@@ -51,6 +51,10 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     private int auto = 0;
     private int power = 0;
 
+    private boolean mIsStopThread = false;
+    private boolean isEnd = false;
+    private Thread mThread;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -60,18 +64,50 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         setTitleText("设 备");
 
         initView();
+        mThread = new GetDeviceInfoThread();
+        mThread.start();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
         doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.deviceid);
+        mIsStopThread = false;
     }
+
+    private class GetDeviceInfoThread extends Thread{
+        @Override
+        public void run() {
+            while(!isEnd) {
+                while (!mIsStopThread) {
+                    try {
+                        Thread.sleep(10 * 1000);//每10秒刷新一次
+                        doDeviceInfoGet(CommonUtils.token, CommonUtils.bean.deviceid);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected void onRestart() {
         super.onRestart();
+        mIsStopThread = false;
         doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.deviceid);
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsStopThread = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isEnd = true;
     }
 
     @Override
@@ -135,7 +171,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
             ToastUtils.show(DeviceOkActivity.this,"设备异常");
         }
         Log.e("oooooooooo","deviceid = "+info.deviceid);
-        ToastUtils.show(DeviceOkActivity.this,info.deviceid);
+//        ToastUtils.show(DeviceOkActivity.this,info.deviceid);
         mTemperatureTv.setText(info.outtmp+"℃");
         mHumidityTv.setText(info.outsweet+"%");
         mPm25Tv.setText(info.outpm25+"");
@@ -154,7 +190,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         mPm25BigTv.setText(((int)info.inpm25)+"");
         //负离子否开关
         fulizi = info.ionsflag;
-        //排气换气是否自动 0 自动 1 手动
+        //排气换气是否自动 2 自动 1 手动
         auto = info.changeOrPushModel;
         //电源开关获取 0 关机 1 开机
 //        power = info.windstatus;
@@ -162,7 +198,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
 
         //排气换气自动 手动
-        boolean paiqihuanqiisopen = auto ==0?false:true; //0自动 1手动
+        boolean paiqihuanqiisopen = auto==2?true:false; //2自动 1手动
         if (paiqihuanqiisopen){
             mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
             mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
@@ -202,7 +238,8 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     ToastUtils.show(DeviceOkActivity.this,"风机处于关机状态，不能进行设置参数！");
                     return;
                 }
-                if (auto == 0){
+//                Log.e("oooooooooooo", "onClick: auto = "+auto);
+                if (auto == 2){
                     ToastUtils.show(DeviceOkActivity.this,"排气换气处于自动模式，不能进行设置参数！");
                     return;
                 }
@@ -254,8 +291,11 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 mIsIonsFlag = true;
                 mIsPower = false;
                 mIsAuto = false;
-                doControlWindCmdGet(CommonUtils.token,info.deviceid,(auto==0?1:0)+"",
-                        "1","1",(fulizi==0?1:0)+"","1",(power==0?1:0)+"");
+                //int auto1 = auto==0?1:0;
+                int fulizi1 = fulizi==0?1:0;
+                //int power1 = power==0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        info.windgear+"",power+"",fulizi1+"","1",power+"");
                 break;
             case R.id.paiqi_huanqi_bottom_rl:
                 if (power == 0){
@@ -265,15 +305,22 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 mIsIonsFlag = false;
                 mIsPower = false;
                 mIsAuto = true;
-                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        "1","1",fulizi+"","1",power+"");
+                int auto11 = auto==1?2:1;
+//                Log.e("ooooooooooooo", "onClick: auto = "+auto +" auto11 = "+auto11);
+                //int fulizi11 = fulizi==0?1:0;
+                //int power11 = power==0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
+                        info.windgear+"",power+"",fulizi+"","1",power+"");
                 break;
             case R.id.fengji_power_rl:
                 mIsIonsFlag = false;
-                mIsPower = false;
-                mIsAuto = true;
+                mIsPower = true;
+                mIsAuto = false;
+                //int auto10 = auto==0?1:0;
+                //int fulizi10 = fulizi==0?1:0;
+                int power10 = power==0?1:0;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        "1","1",fulizi+"","1",power+"");
+                        info.windgear+"",power10+"",fulizi+"","1",power10+"");
                 break;
             default:
                 break;
@@ -304,9 +351,11 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
                     DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
-                    CommonUtils.bean = null;
-                    CommonUtils.bean = info.data;
-                    mHandler.sendEmptyMessage(3);
+                    if (CommonUtils.bean != info.data) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
+                        CommonUtils.bean = null;
+                        CommonUtils.bean = info.data;
+                        mHandler.sendEmptyMessage(3);
+                    }
                 } else if (res.contains(":0,")){
                     mHandler.sendEmptyMessage(5);
                 } else {
@@ -381,7 +430,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                         if (mPaiqiHaunqiAuto.getVisibility() == View.GONE){
                             mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
                             mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
-                            auto = 0;
+                            auto = 2;
                         } else {
                             auto = 1;
                             mPaiqiHaunqiAuto.setVisibility(View.GONE);
