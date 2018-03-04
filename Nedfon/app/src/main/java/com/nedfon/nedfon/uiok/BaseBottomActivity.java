@@ -12,14 +12,17 @@ import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.nedfon.nedfon.R;
+import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.NetWorkUtils;
 import com.nedfon.nedfon.utils.StatusBarCompat;
 import com.nedfon.nedfon.utils.ToastUtils;
+import com.nedfon.nedfon.view.DeviceDataSearchDialog;
 
 public abstract class BaseBottomActivity extends AppCompatActivity {
 
@@ -59,7 +62,20 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
         ll_datasearch.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                if (NAME.equals(DataSearchActivity.class.getSimpleName())){
+                    return;
+                }
+                final DeviceDataSearchDialog dialog = new DeviceDataSearchDialog(BaseBottomActivity.this);
+                dialog.ShowDialog(CommonUtils.mDeviceList, new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        CommonUtils.deviceSN = CommonUtils.mDeviceList[position];
+                        Intent intent = new Intent(BaseBottomActivity.this,DataSearchActivity.class);
+                        startActivity(intent);
+                        BaseBottomActivity.this.finish();
+                        dialog.dismiss();
+                    }
+                });
             }
         });
         ll_setinternet.setOnClickListener(new View.OnClickListener() {
@@ -106,7 +122,7 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
                 mDeviceSetInternetIv.setImageResource(R.drawable.set_internet_selected);
                 break;
             case 3:
-                mDeviceBindIv.setImageResource(R.drawable.device_bind_selected);
+                mDeviceBindIv.setImageResource(R.drawable.device_list_selected);
                 break;
             case 4:
                 mPersonalInfoIv.setImageResource(R.drawable.my_icon_selected);
@@ -149,7 +165,7 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
     private void viewdefualtStatus(){
         mDataQueryIv.setImageResource(R.drawable.data_query);
         mDeviceSetInternetIv.setImageResource(R.drawable.set_internet_unselect);
-        mDeviceBindIv.setImageResource(R.drawable.device_bind_unselect);
+        mDeviceBindIv.setImageResource(R.drawable.device_list_unselected);
         mPersonalInfoIv.setImageResource(R.drawable.my_icon_unselect);
     }
 

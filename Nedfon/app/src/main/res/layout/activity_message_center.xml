@@ -25,13 +25,13 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="8.8"
+        android:background="@color/message_center_list_bg"
         >
         <ListView
             android:id="@+id/activity_message_center_lv"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@color/message_center_list_bg"
-            android:background="@color/message_center_list_bg"
             android:dividerHeight="0dp"
             ></ListView>
     </LinearLayout>

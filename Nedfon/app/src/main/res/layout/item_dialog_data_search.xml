@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<TextView
+    android:id="@+id/item_dialog_data_search_tv"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="60dp"
+    android:gravity="center"
+    android:background="@color/white"
+    android:textColor="@color/device_gray_shen"
+    android:textSize="16sp"
+    android:text="2013467554"
+    android:padding="10dp"
+    >
+</TextView>

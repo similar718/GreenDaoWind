@@ -42,9 +42,13 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
 
     private TimerChoiceDialog mDialog;
 
-    private int week = Entity.Mon;;
     private int num = 0;
+    private String start = "";
+    private String end = "";
+
     private int mnum = 0;
+    private String mstart = "";
+    private String mend = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,8 +113,14 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
     }
 
     private void initData() {
-        mStartTv.setText(info.opentime);
-        mEndTv.setText(info.closetime);
+        start = info.opentime;
+        mstart = start;
+
+        end = info.closetime;
+        mend = end;
+
+        mStartTv.setText(start);
+        mEndTv.setText(end);
 
         num = info.settime;
         mnum = num;
@@ -179,9 +189,7 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
         switch (v.getId()){
             case R.id.activity_timer_setting_sure_rl: //确定
                 if (mIsSelected) {
-                    doControlTimerCmdGet(CommonUtils.token,mStartTv.getText().toString(),mEndTv.getText().toString(),num+"",info.deviceid);
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
+                    doControlTimerCmdGet(CommonUtils.token,start,end,num+"",info.deviceid);
                 }
                 break;
 
@@ -190,6 +198,7 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
                     @Override
                     public void onClick(View v) {
                         String time = mDialog.getTime();
+                        start = time;
                         mStartTv.setText(time);
                         mDialog.dismiss();
                     }
@@ -203,6 +212,7 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
                     public void onClick(View v) {
                         String time = mDialog.getTime();
                         mEndTv.setText(time);
+                        end = time;
                         mDialog.dismiss();
                     }
                 });
@@ -299,11 +309,15 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
         }
     }
     private void setSureBtn(){
-        if ( info.opentime == mStartTv.getText().toString() && info.closetime == mEndTv.getText().toString() && num == mnum){
+        if ( mstart.equals(start) && mend.equals(end) && num == mnum){
+            if (!mIsSelected)
+                return;
             mIsSelected = false;
             mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
             mSureIv.setImageResource(R.drawable.sure_selected_gou);
         } else {
+            if (mIsSelected)
+                return;
             mIsSelected = true;
             mSureRl.setBackgroundResource(R.drawable.sure_unselect_bg);
             mSureIv.setImageResource(R.drawable.sure_unselect_gou);
@@ -356,6 +370,12 @@ public class TimerSettingOkActivity extends BaseTopBottomActivity implements Vie
             switch (msg.what){
                 case 1:
                     ToastUtils.show(TimerSettingOkActivity.this,"设置成功！");
+                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
+                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
+                    mIsSelected = false;
+                    mstart = start;
+                    mend = end;
+                    mnum = num;
                     break;
                 case 2 :
                     ToastUtils.show(TimerSettingOkActivity.this,"其他错误");

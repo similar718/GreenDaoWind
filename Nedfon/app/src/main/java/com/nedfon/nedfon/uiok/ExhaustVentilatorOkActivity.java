@@ -115,8 +115,6 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
                 break;
             case R.id.activity_exhaust_ventilation_sure_rl:
                 if (mIsSelected) {
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
                     doControlWindCmdGet(CommonUtils.token,info.deviceid,info.changeOrPushModel+"",
                             isdi+"",info.workmodel+"",info.ionsflag+"","1",info.workmodel+"");
                 }
@@ -189,6 +187,10 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
             switch (msg.what){
                 case 1:
                     ToastUtils.show(ExhaustVentilatorOkActivity.this,"设置成功！");
+                    misdi = isdi;
+                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
+                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
+                    mIsSelected = false;
                     break;
                 case 2 :
                     ToastUtils.show(ExhaustVentilatorOkActivity.this,"其他错误");

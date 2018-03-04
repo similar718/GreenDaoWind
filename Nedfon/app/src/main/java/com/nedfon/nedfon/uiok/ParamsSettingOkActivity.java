@@ -221,8 +221,6 @@ public class ParamsSettingOkActivity extends BaseTopBottomActivity implements Vi
         switch (v.getId()){
             case R.id.activity_params_setting_sure_rl: //确定
                 if (mIsSelected) {
-                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
-                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
                     doControlThresholdCmdGet(CommonUtils.token,info.deviceid,mtemperature+"",mhumidity+"",mpm25+"");
                 }
                 break;
@@ -351,6 +349,12 @@ public class ParamsSettingOkActivity extends BaseTopBottomActivity implements Vi
             switch (msg.what){
                 case 1:
                     ToastUtils.show(ParamsSettingOkActivity.this,"设置成功！");
+                    mSureRl.setBackgroundResource(R.drawable.sure_selected_bg);
+                    mSureIv.setImageResource(R.drawable.sure_selected_gou);
+                    mIsSelected = false;
+                    humidity = mhumidity;
+                    pm25 = mpm25;
+                    temperature = mtemperature;
                     break;
                 case 2 :
                     ToastUtils.show(ParamsSettingOkActivity.this,"其他错误");

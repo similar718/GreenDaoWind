@@ -89,7 +89,7 @@ public class MyInformationActivity extends AppCompatActivity implements View.OnC
     }
 
     public void showPopFormBottom() {
-        SexChoicePopupWindow takePhotoPopWin = new SexChoicePopupWindow(this);
+        SexChoicePopupWindow takePhotoPopWin = new SexChoicePopupWindow(this,mSexTv.getText().toString().equals("女")?0:1);
         //  设置Popupwindow显示位置（从底部弹出）
         takePhotoPopWin.showAtLocation(findViewById(R.id.my_information_layout), Gravity.BOTTOM| Gravity.CENTER_HORIZONTAL, 0, 0);
 

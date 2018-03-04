@@ -1,8 +1,11 @@
 package com.nedfon.nedfon.uiok;
 
 import android.content.Intent;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
 import android.view.WindowManager;
@@ -11,9 +14,22 @@ import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
 
+import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
+import com.nedfon.nedfon.bean.GetPersonInfoAllBean;
+import com.nedfon.nedfon.bean.GetPersonInfoBean;
+import com.nedfon.nedfon.utils.CommonUtils;
+import com.nedfon.nedfon.utils.ToastUtils;
 import com.nedfon.nedfon.view.SexChoicePopupWindow;
 import com.citypicker.CityPickerActivity;
+import com.squareup.okhttp.Call;
+import com.squareup.okhttp.Callback;
+import com.squareup.okhttp.FormEncodingBuilder;
+import com.squareup.okhttp.OkHttpClient;
+import com.squareup.okhttp.Request;
+import com.squareup.okhttp.Response;
+
+import java.io.IOException;
 
 public class MyInformationOkActivity extends BaseBottomActivity implements View.OnClickListener {
 
@@ -22,6 +38,8 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
     private EditText mNameEt;
     private TextView mAddressTv,mSexTv;
     private ImageView mAddressIv,mSexIv;
+
+    private GetPersonInfoBean bean = CommonUtils.info;
 
 
     private static final int REQUEST_CODE_PICK_CITY = 233;
@@ -59,6 +77,19 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
         mFinishTv.setOnClickListener(this);
         mAddressIv.setOnClickListener(this);
         mSexIv.setOnClickListener(this);
+
+        initData();
+    }
+
+    private void initData() {
+        mPhoneumberTv.setText(bean.phone);
+        mNameEt.setText(bean.nickname);
+        mAddressTv.setText(bean.registerIp);
+        if (bean.sex==0){ //女
+            mSexTv.setText("女");
+        } else {
+            mSexTv.setText("男");
+        }
     }
 
     @Override
@@ -68,6 +99,11 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
                 setBackOnClick();
                 break;
             case R.id.activity_my_information_finish_tv://完成
+                if ("".equals(mAddressTv.getText().toString()) || null == mAddressTv.getText().toString()){
+                    ToastUtils.show(MyInformationOkActivity.this,"地址不能为空！");
+                    return;
+                }
+                doUpdatePersonInfoGet(CommonUtils.token,mSexTv.getText().toString().equals("女")?0:1,mNameEt.getText().toString(),mAddressTv.getText().toString());
                 break;
             case R.id.activity_my_information_address_right_iv://地址选择
                 startActivityForResult(new Intent(MyInformationOkActivity.this, CityPickerActivity.class),
@@ -92,7 +128,7 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
     }
 
     public void showPopFormBottom() {
-        SexChoicePopupWindow takePhotoPopWin = new SexChoicePopupWindow(this);
+        SexChoicePopupWindow takePhotoPopWin = new SexChoicePopupWindow(this,mSexTv.getText().toString().equals("女")?0:1);
         //  设置Popupwindow显示位置（从底部弹出）
         takePhotoPopWin.showAtLocation(findViewById(R.id.my_information_layout), Gravity.BOTTOM| Gravity.CENTER_HORIZONTAL, 0, 0);
 
@@ -117,4 +153,64 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
             }
         });
     }
+
+    private static OkHttpClient okhttpclient = new OkHttpClient();
+    /**
+     *   个人信息资料的获取
+     */
+    private  void doUpdatePersonInfoGet(String token,int sex,String nickname,String address){
+        //1.拿到OkHttpClient对象
+        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        //2.构造Request
+        Request.Builder builder = new Request.Builder();
+        //http://localhost:9090/mobileapi/updatePersonInfo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTk5NTg5MjksInVzZXJuYW1lIjoiMTM1MTI3NzQ3NjAifQ.DP22dBsyMqnPoQyMw0KV51WN_OImBxI8rfphBS-eWfs
+        // &sex=1&
+        // nickname=test1&
+        // registerIp=深圳
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/updatePersonInfo?token="+token+
+        "&sex="+sex+"&nickname="+nickname+"&registerIp="+address).get().build();
+        executeUpdatePersonInfoRequest(request);
+    }
+
+    private void executeUpdatePersonInfoRequest(Request request) {
+        //3.将Request封装为Call
+        Call call = okhttpclient.newCall(request);
+        //异步使用CallBack  同步用call.execute()
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                final String res = response.body().string();
+                Log.e("oooooooooo", "onResponse:  res = "+res );
+//                if (res.contains(":1,")){
+                    mHandler.sendEmptyMessage(3);
+//                } else if (res.contains(":0,")){
+//                    mHandler.sendEmptyMessage(1);
+//                } else {
+//                    mHandler.sendEmptyMessage(2);
+//                }
+            }
+        });
+    }
+    public Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 1:
+                    ToastUtils.show(MyInformationOkActivity.this,"更改个人信息失败！");
+                    break;
+                case 2 :
+                    ToastUtils.show(MyInformationOkActivity.this,"其他错误");
+                    break;
+                case 3 :
+                    ToastUtils.show(MyInformationOkActivity.this,"更改个人信息成功！");
+                    setBackOnClick();
+                    break;
+            }
+        }
+    };
+
 }

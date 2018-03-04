@@ -76,6 +76,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
         }
         mList = new ArrayList<>();
         mList.clear();
+        String[] list = new String[mlistbean.data.size()];
         for (int i=0;i<mlistbean.data.size();i++){
             DeviceBindBean_test bean = new DeviceBindBean_test();
             bean.name = mlistbean.data.get(i).deviceid;
@@ -84,7 +85,10 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             bean.shidu = mlistbean.data.get(i).insweet+"%";
             bean.pm25 = mlistbean.data.get(i).inpm25+"";
             mList.add(bean);
+            list[i] = mlistbean.data.get(i).deviceid;
         }
+        CommonUtils.mDeviceList = list;
+        Log.e("oooooooooooo","get list size = "+CommonUtils.mDeviceList.length+"  get 1 = "+CommonUtils.mDeviceList[0]);
         mAdapter.setData(mList);
     }
 

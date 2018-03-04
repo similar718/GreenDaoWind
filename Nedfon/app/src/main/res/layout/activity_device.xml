@@ -577,7 +577,7 @@
                         android:id="@+id/fulizi_iv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/exhaust_icon"
+                        android:src="@drawable/anion_icon"
                         />
                     <TextView
                         android:layout_width="wrap_content"

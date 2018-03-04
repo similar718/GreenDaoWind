@@ -81,7 +81,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
             while(!isEnd) {
                 while (!mIsStopThread) {
                     try {
-                        Thread.sleep(10 * 1000);//每10秒刷新一次
+                        Thread.sleep(5 * 1000);//每10秒刷新一次  更改为5秒
                         doDeviceInfoGet(CommonUtils.token, CommonUtils.bean.deviceid);
                     } catch (InterruptedException e) {
                         e.printStackTrace();

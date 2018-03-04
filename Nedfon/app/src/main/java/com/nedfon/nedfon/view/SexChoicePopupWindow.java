@@ -22,11 +22,20 @@ public class SexChoicePopupWindow extends PopupWindow {
     public static int sex = 0;
 
 
-    public SexChoicePopupWindow(final Context mContext) {
+    public SexChoicePopupWindow(final Context mContext,int sexs) {
         this.view = LayoutInflater.from(mContext).inflate(R.layout.sex_choice_pop, null);
         mSureTv = (TextView) view.findViewById(R.id.sex_choice_pop_sure_tv);
         mManTv = view.findViewById(R.id.sex_choice_pop_man_tv);
         mWomanTv = view.findViewById(R.id.sex_choice_pop_woman_tv);
+        if (sexs == 0){
+            sex = 1;
+            mManTv.setTextColor(Color.parseColor("#B9B9B9"));
+            mWomanTv.setTextColor(Color.parseColor("#000000"));
+        } else {
+            sex = 0;
+            mManTv.setTextColor(Color.parseColor("#000000"));
+            mWomanTv.setTextColor(Color.parseColor("#B9B9B9"));
+        }
         // 确定按钮
         mSureTv.setOnClickListener(new View.OnClickListener() {
             @Override

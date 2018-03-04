@@ -3,6 +3,8 @@ package com.nedfon.nedfon.uiok;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
@@ -14,15 +16,19 @@ import com.nedfon.nedfon.R;
 import com.nedfon.nedfon.bean.DbDean;
 import com.nedfon.nedfon.bean.DeviceInfo;
 import com.nedfon.nedfon.bean.DeviceInfoAll;
+import com.nedfon.nedfon.bean.GetPersonInfoAllBean;
 import com.nedfon.nedfon.db.MyDBHelper;
 import com.nedfon.nedfon.ui.LoginActivity;
 import com.nedfon.nedfon.utils.CommonUtils;
+import com.nedfon.nedfon.utils.ToastUtils;
 import com.squareup.okhttp.Call;
 import com.squareup.okhttp.Callback;
 import com.squareup.okhttp.FormEncodingBuilder;
 import com.squareup.okhttp.OkHttpClient;
 import com.squareup.okhttp.Request;
 import com.squareup.okhttp.Response;
+
+import org.w3c.dom.Comment;
 
 import java.io.IOException;
 import java.util.List;
@@ -95,6 +101,9 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
 //        mPhoneNumberTv.setText(info.userphone);
 
         myDBHelper = new MyDBHelper(this);
+
+
+        doGetPersonInfoGet(CommonUtils.token);
     }
 
     @Override
@@ -134,42 +143,68 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
                 break;
         }
     }
-//
-//    private void doDeviceInfoGet(String token,String deviceSN){
-//        //1.拿到OkHttpClient对象
-//        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
-//        //2.构造Request]
-//        Request.Builder builder = new Request.Builder();
-//        Request request = builder.url(CommonUtils.localhost+"mobileapi/deviceInfo?token="+token+"&deviceSN="+deviceSN).get().build();
-//        executeDeviceInfoRequest(request);
-//    }
-//    private void executeDeviceInfoRequest(Request request) {
-//        //3.将Request封装为Call
-//        Call call = okhttpclient.newCall(request);
-//        //异步使用CallBack  同步用call.execute()
-//        call.enqueue(new Callback() {
-//            @Override
-//            public void onFailure(Request request, IOException e) {
-//                e.printStackTrace();
-//                return;
-//            }
-//            @Override
-//            public void onResponse(Response response) throws IOException {
-//                final String res = response.body().string();
-//                Log.e("oooooooooo", "onResponse:  res = "+res );
-//                if (res.contains(":1,")){
-//                    DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
-//                    CommonUtils.bean = null;
-//                    CommonUtils.bean = info.data;
-//                    mHandler.sendEmptyMessage(3);
-//                } else if (res.contains(":0,")){
-//                    mHandler.sendEmptyMessage(5);
-//                } else {
-//                    mHandler.sendEmptyMessage(2);
-//                }
-//            }
-//        });
-//    }
-//
-//    private static OkHttpClient okhttpclient = new OkHttpClient();
+
+    private static OkHttpClient okhttpclient = new OkHttpClient();
+    /**
+     *   个人信息资料的获取
+     */
+    private  void doGetPersonInfoGet(String token){
+        //1.拿到OkHttpClient对象
+        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        //2.构造Request
+        Request.Builder builder = new Request.Builder();
+        // http://localhost:9090/mobileapi/getPersonInfo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTk5NTg5MjksInVzZXJuYW1lIjoi
+        // MTM1MTI3NzQ3NjAifQ.DP22dBsyMqnPoQyMw0KV51WN_OImBxI8rfphBS-eWfs
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/getPersonInfo?token="+token).get().build();
+        executeGetPersonInfoRequest(request);
+    }
+
+    private GetPersonInfoAllBean mBean = null;
+
+    private void executeGetPersonInfoRequest(Request request) {
+        //3.将Request封装为Call
+        Call call = okhttpclient.newCall(request);
+        //异步使用CallBack  同步用call.execute()
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Request request, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Response response) throws IOException {
+                final String res = response.body().string();
+                Log.e("oooooooooo", "onResponse:  res = "+res );
+                if (res.contains("nickname\":")){
+                    mBean = new Gson().fromJson(res,GetPersonInfoAllBean.class);
+                    mHandler.sendEmptyMessage(3);
+                } else if (res.contains(":0,")){
+                    mHandler.sendEmptyMessage(1);
+                } else {
+                    mHandler.sendEmptyMessage(2);
+                }
+            }
+        });
+    }
+    public Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 1:
+                    ToastUtils.show(PersonalCenterOkActivity.this,"获取个人信息失败！");
+                    break;
+                case 2 :
+                    ToastUtils.show(PersonalCenterOkActivity.this,"其他错误");
+                    break;
+                case 3 :
+                    initData();
+                    break;
+            }
+        }
+    };
+
+    private void initData() {
+        CommonUtils.info = mBean.data;
+        mUserNameTv.setText(mBean.data.nickname);
+        mPhoneNumberTv.setText(mBean.data.phone);
+    }
 }

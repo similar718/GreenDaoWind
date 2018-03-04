@@ -10,7 +10,7 @@
         style="@style/LetterIndexTextViewStyle"
         android:text="@string/cp_hot_city"/>
 
-    <com.zaaach.citypicker.view.WrapHeightGridView
+    <com.citypicker.view.WrapHeightGridView
         android:id="@+id/gridview_hot_city"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
