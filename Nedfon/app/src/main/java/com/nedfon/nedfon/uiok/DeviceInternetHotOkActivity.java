@@ -70,7 +70,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
     private String pwd = "nedfon123456";
 
     private boolean isopen = false;
-    private String Bssid = "";
+//    private String Bssid = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -171,7 +171,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         String apSsid = name;
         String apPassword = pwd;
         String apBssid = MacUtils.getMac();
-        Bssid = apBssid;
+//        Bssid = apBssid;
         String taskResultCountStr = Integer.toString(4);
         if (__IEsptouchTask.DEBUG) {
             Log.d("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid+ " apBssid = "+apBssid
@@ -198,17 +198,24 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                 String text = result.getBssid() + " is connected to the wifi";
                 Toast.makeText(DeviceInternetHotOkActivity.this, "配网成功",
                         Toast.LENGTH_LONG).show();
+                if (mProgressDialog.isShowing()){
+                    mProgressDialog.dismiss();
+                }
                 mConnectPrompttv.setText("连接成功");
-                douploadDeviceMacGet(CommonUtils.token,Bssid);
+                douploadDeviceMacGet(CommonUtils.token,result.getBssid());
+//                douploadDeviceMacGet(CommonUtils.token,Bssid);
 //                setBackOnClick();
             }
 
         });
     }
 
+
+    private ProgressDialog mProgressDialog;
+
     private class EsptouchAsyncTask3 extends AsyncTask<String, Void, List<IEsptouchResult>> {
 
-        private ProgressDialog mProgressDialog;
+//        private ProgressDialog mProgressDialog;
 
         private IEsptouchTask mEsptouchTask;
         // without the lock, if the user tap confirm and cancel quickly enough,
@@ -289,6 +296,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                                 + ",InetAddress = "
                                 + resultInList.getInetAddress()
                                 .getHostAddress() + "\n");
+//                        Bssid = resultInList.getBssid();
                         count++;
                         if (count >= maxDisplayCount) {
                             break;
@@ -298,6 +306,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                         sb.append("\nthere's " + (result.size() - count)
                                 + " more result(s) without showing\n");
                     }
+//                    douploadDeviceMacGet(CommonUtils.token,Bssid);
                     mConnectPrompttv.setText("连接成功");
                     mProgressDialog.setMessage("设备配网成功");
                 } else {
@@ -362,6 +371,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         executeuploadDeviceMacRequest(request);
     }
 
+    private String uploadres = "";
     private void executeuploadDeviceMacRequest(Request request) {
         //3.将Request封装为Call
         Call call = okhttpclient.newCall(request);
@@ -377,6 +387,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
+                    uploadres = res;
                     mHandler.sendEmptyMessage(1);
                 } else if (res.contains(":0,")){
                     mHandler.sendEmptyMessage(5);
@@ -391,14 +402,14 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-                    ToastUtils.show(DeviceInternetHotOkActivity.this,"上传成功！");
+                    ToastUtils.show(DeviceInternetHotOkActivity.this,"上传成功！ "+uploadres);
                     setBackOnClick();
                     break;
                 case 2 :
                     ToastUtils.show(DeviceInternetHotOkActivity.this,"其他错误");
                     break;
                 case 5 :
-                    ToastUtils.show(DeviceInternetHotOkActivity.this,"设置失败,可能设备离线！");
+                    ToastUtils.show(DeviceInternetHotOkActivity.this,"上传失败！");
                     break;
             }
         }

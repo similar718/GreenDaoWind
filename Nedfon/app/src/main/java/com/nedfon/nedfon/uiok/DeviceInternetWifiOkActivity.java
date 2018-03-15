@@ -47,7 +47,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
     private RelativeLayout mConnectRl;
 
     private String WIFINAME = "";
-    private String Bssid = "";
+//    private String Bssid = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,7 +109,8 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
         String apSsid = WIFINAME.substring(1,WIFINAME.length()-1);
         String apPassword = mWifiPwdEt.getText().toString();
         String apBssid = mWifiAdmin.getWifiConnectedBssid();
-        Bssid = Bssid;
+//        Bssid = apBssid;
+//        Log.e("oooooooooooo","token = "+ CommonUtils.token+" bssid = "+Bssid);
         String taskResultCountStr = Integer.toString(4);
         if (__IEsptouchTask.DEBUG) {
             Log.e("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid+" apBssid = "+apBssid
@@ -136,16 +137,20 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
                 String text = result.getBssid() + " is connected to the wifi";
                 Toast.makeText(DeviceInternetWifiOkActivity.this, "配网成功",
                         Toast.LENGTH_LONG).show();
+                if (mProgressDialog.isShowing()){
+                    mProgressDialog.dismiss();
+                }
                 mConnectPrompttv.setText("连接成功");
-                douploadDeviceMacGet(CommonUtils.token,Bssid);
+                douploadDeviceMacGet(CommonUtils.token,result.getBssid());
             }
 
         });
     }
 
+    private ProgressDialog mProgressDialog;
     private class EsptouchAsyncTask3 extends AsyncTask<String, Void, List<IEsptouchResult>> {
 
-        private ProgressDialog mProgressDialog;
+//        private ProgressDialog mProgressDialog;
 
         private IEsptouchTask mEsptouchTask;
         // without the lock, if the user tap confirm and cancel quickly enough,
@@ -226,6 +231,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
                                 + ",InetAddress = "
                                 + resultInList.getInetAddress()
                                 .getHostAddress() + "\n");
+//                        Bssid = resultInList.getBssid();
                         count++;
                         if (count >= maxDisplayCount) {
                             break;
@@ -237,6 +243,8 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
                     }
                     mConnectPrompttv.setText("连接成功");
                     mProgressDialog.setMessage("设备配网成功");
+
+//                    douploadDeviceMacGet(CommonUtils.token,Bssid);
 //                    mProgressDialog.dismiss();
                 } else {
                     mConnectPrompttv.setText("连接失败");
@@ -264,10 +272,12 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
         FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
+
+//        Request request = builder.url(CommonUtils.localhost+"mobileapi/uploadDeviceMac?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MjE3MTAyNjAsInVzZXJuYW1lIjoiMTM1MTI3NzQ3NjAifQ.dUxD1tTnlfLZx91Q1J1JtcaISwDSJUtkWPrKzGtvmzg&deviceMac=ecfabc0e12ec").get().build();
         Request request = builder.url(CommonUtils.localhost+"mobileapi/uploadDeviceMac?token="+token+"&deviceMac="+deviceMac).get().build();
         executeuploadDeviceMacRequest(request);
     }
-
+    private String uploadres = "";
     private void executeuploadDeviceMacRequest(Request request) {
         //3.将Request封装为Call
         Call call = okhttpclient.newCall(request);
@@ -283,6 +293,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
+                    uploadres = res;
                     mHandler.sendEmptyMessage(1);
                 } else if (res.contains(":0,")){
                     mHandler.sendEmptyMessage(5);
@@ -297,14 +308,14 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-                    ToastUtils.show(DeviceInternetWifiOkActivity.this,"上传成功！");
+                    ToastUtils.show(DeviceInternetWifiOkActivity.this,"上传成功！"+uploadres);
                     setBackOnClick();
                     break;
                 case 2 :
                     ToastUtils.show(DeviceInternetWifiOkActivity.this,"其他错误");
                     break;
                 case 5 :
-                    ToastUtils.show(DeviceInternetWifiOkActivity.this,"设置失败,可能设备离线！");
+                    ToastUtils.show(DeviceInternetWifiOkActivity.this,"上传失败！");
                     break;
             }
         }
