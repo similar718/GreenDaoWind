@@ -675,29 +675,63 @@
             android:layout_width="0dp"
             android:layout_weight="2"
             android:layout_height="wrap_content"
-            android:background="@drawable/exhaust_ventilation_btn"
             >
             <RelativeLayout
                 android:id="@+id/exhaust_ventilation_rl"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerHorizontal="true"
-                android:layout_marginTop="15dp">
+                android:layout_marginTop="0dp">
 
-                <ImageView
-                    android:id="@+id/ventilation_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:src="@drawable/sendfengset"
-                    />
-                <ImageView
-                    android:id="@+id/exhaust_iv"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_toRightOf="@+id/ventilation_iv"
-                    android:src="@drawable/exhaust_set"
+                <RelativeLayout
+                    android:id="@+id/exhaust_ventilation_di_rl"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:background="@drawable/stall_btn_selected"
+                    >
+                    <ImageView
+                        android:id="@+id/ventilation_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/three_leaf_icon"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="低"
+                        android:textColor="@color/white"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        />
+                </RelativeLayout>
+
+                <RelativeLayout
+                    android:id="@+id/exhaust_ventilation_gao_rl"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
                     android:layout_marginLeft="20dp"
-                    />
+                    android:background="@drawable/stall_btn_unselect"
+                    android:layout_toRightOf="@+id/exhaust_ventilation_di_rl"
+                    >
+                    <ImageView
+                        android:id="@+id/exhaust_iv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:src="@drawable/five_leaf_icon"
+                        android:layout_centerHorizontal="true"
+                        android:layout_marginTop="8dp"
+                        />
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="高"
+                        android:textColor="@color/white"
+                        android:layout_alignParentBottom="true"
+                        android:layout_centerHorizontal="true"
+                        />
+                </RelativeLayout>
 
             </RelativeLayout>
             <TextView

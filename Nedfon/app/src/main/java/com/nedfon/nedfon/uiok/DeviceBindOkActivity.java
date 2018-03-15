@@ -25,16 +25,23 @@ import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.NetWorkUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 import com.nedfon.nedfon.view.DeviceSetInternetDialog;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.Call;
+//import com.squareup.okhttp.Callback;
+//import com.squareup.okhttp.FormEncodingBuilder;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class DeviceBindOkActivity extends BaseBottomActivity {
 
@@ -187,7 +194,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
      */
     private  void doDeviceListGet(String token){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         Request request = builder.url(CommonUtils.localhost+"mobileapi/deviceList?token="+token).get().build();
@@ -201,11 +208,11 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
@@ -225,7 +232,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
      */
     private  void doGetCurrentWeatherGet(String token){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         Request request = builder.url(CommonUtils.localhost+"mobileapi/getCurrentWeather?token="+token).get().build();
@@ -240,11 +247,11 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){

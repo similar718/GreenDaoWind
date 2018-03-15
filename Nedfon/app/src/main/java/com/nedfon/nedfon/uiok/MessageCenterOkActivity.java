@@ -18,16 +18,23 @@ import com.nedfon.nedfon.bean.GetMsgInfoAllBean;
 import com.nedfon.nedfon.bean.MessageCenterBean_test;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.Call;
+//import com.squareup.okhttp.Callback;
+//import com.squareup.okhttp.FormEncodingBuilder;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class MessageCenterOkActivity extends BaseTopBottomActivity implements View.OnClickListener {
 
@@ -116,7 +123,7 @@ public class MessageCenterOkActivity extends BaseTopBottomActivity implements Vi
      */
     private  void doGetMsgInfoGet(String token){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         //http://localhost:9090/mobileapi/getMsgInfo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.
@@ -132,11 +139,11 @@ public class MessageCenterOkActivity extends BaseTopBottomActivity implements Vi
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){

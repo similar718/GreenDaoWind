@@ -29,21 +29,29 @@ import com.nedfon.nedfon.bean.LoginSuccess;
 import com.nedfon.nedfon.db.MyDBHelper;
 import com.nedfon.nedfon.uiok.DeviceBindOkActivity;
 import com.nedfon.nedfon.utils.CommonUtils;
-import com.nedfon.nedfon.utils.GetHttpDataFunction;
+//import com.nedfon.nedfon.utils.GetHttpDataFunction;
 import com.nedfon.nedfon.utils.StatusBarCompat;
 import com.nedfon.nedfon.utils.ToastUtils;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.Call;
+//import com.squareup.okhttp.Callback;
+//import com.squareup.okhttp.FormEncodingBuilder;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.RequestBody;
+//import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -230,7 +238,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void doLoginPost(String phone,String pwd){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+//        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         RequestBody requestBody = requestBodyBuilder
                 .add("phone",phone)
@@ -248,12 +257,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
                 return;
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":0,")){
@@ -273,7 +282,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
     private void doCertificateUpdatePost(String token){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         Request request = builder.url(CommonUtils.localhost+"mobileapi/certificateUpdate?token="+token).get().build();
@@ -285,12 +294,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
                 return;
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":0,")){

@@ -9,6 +9,8 @@ import android.content.pm.PackageManager;
 import android.net.wifi.WifiConfiguration;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Message;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -27,11 +29,20 @@ import com.espressif.iot.esptouch.demo_activity.EspWifiAdminSimple;
 import com.espressif.iot.esptouch.task.__IEsptouchTask;
 import com.nedfon.nedfon.R;
 import com.nedfon.nedfon.ui.LoginActivity;
+import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.MacUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 
+import java.io.IOException;
 import java.lang.reflect.Method;
 import java.util.List;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 import static android.Manifest.permission.ACCESS_COARSE_LOCATION;
 import static android.Manifest.permission.ACCESS_FINE_LOCATION;
@@ -59,6 +70,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
     private String pwd = "nedfon123456";
 
     private boolean isopen = false;
+    private String Bssid = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,6 +171,7 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         String apSsid = name;
         String apPassword = pwd;
         String apBssid = MacUtils.getMac();
+        Bssid = apBssid;
         String taskResultCountStr = Integer.toString(4);
         if (__IEsptouchTask.DEBUG) {
             Log.d("ooooooooooooo", "mBtnConfirm is clicked, mEdtApSsid = " + apSsid+ " apBssid = "+apBssid
@@ -186,7 +199,8 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
                 Toast.makeText(DeviceInternetHotOkActivity.this, "配网成功",
                         Toast.LENGTH_LONG).show();
                 mConnectPrompttv.setText("连接成功");
-                setBackOnClick();
+                douploadDeviceMacGet(CommonUtils.token,Bssid);
+//                setBackOnClick();
             }
 
         });
@@ -326,4 +340,67 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
             }
         }
     }
+
+    private static OkHttpClient okhttpclient = new OkHttpClient();
+    /*
+    上传设备bssid
+    http://localhost/mobileapi/uploadDeviceMac?token=abcvTkdjsd_1209990ijhyty&deviceMac=000000001  GET
+    参数说明：
+    token：登录token
+    deviceMac:配网成功返回设备的BSSID值
+    成功：{'result':1,'msg':'绑定设备成功'}
+    失败：{'result'-1,'msg':'绑定设备不存在'}
+    失败：{'result':-2,'msg':'该设备已经绑定'}
+    失败：{'result':0,'msg':'绑定设备失败'}
+     */
+    private void douploadDeviceMacGet(String token,String deviceMac){
+        //1.拿到OkHttpClient对象
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
+        //2.构造Request
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/uploadDeviceMac?token="+token+"&deviceMac="+deviceMac).get().build();
+        executeuploadDeviceMacRequest(request);
+    }
+
+    private void executeuploadDeviceMacRequest(Request request) {
+        //3.将Request封装为Call
+        Call call = okhttpclient.newCall(request);
+        //异步使用CallBack  同步用call.execute()
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call request, IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            @Override
+            public void onResponse(Call request, Response response) throws IOException {
+                final String res = response.body().string();
+                Log.e("oooooooooo", "onResponse:  res = "+res );
+                if (res.contains(":1,")){
+                    mHandler.sendEmptyMessage(1);
+                } else if (res.contains(":0,")){
+                    mHandler.sendEmptyMessage(5);
+                } else {
+                    mHandler.sendEmptyMessage(2);
+                }
+            }
+        });
+    }
+    public Handler mHandler = new Handler(){
+        @Override
+        public void handleMessage(Message msg) {
+            switch (msg.what){
+                case 1:
+                    ToastUtils.show(DeviceInternetHotOkActivity.this,"上传成功！");
+                    setBackOnClick();
+                    break;
+                case 2 :
+                    ToastUtils.show(DeviceInternetHotOkActivity.this,"其他错误");
+                    break;
+                case 5 :
+                    ToastUtils.show(DeviceInternetHotOkActivity.this,"设置失败,可能设备离线！");
+                    break;
+            }
+        }
+    };
 }

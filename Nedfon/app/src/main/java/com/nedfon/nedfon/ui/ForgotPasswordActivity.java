@@ -14,22 +14,34 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.nedfon.nedfon.R;
+import com.nedfon.nedfon.utils.BaseCallBack;
+import com.nedfon.nedfon.utils.BaseOkHttpClient;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.CountDownTimerUtils;
-import com.nedfon.nedfon.utils.GetHttpDataFunction;
+//import com.nedfon.nedfon.utils.GetHttpDataFunction;
 import com.nedfon.nedfon.utils.StatusBarCompat;
 import com.nedfon.nedfon.utils.ToastUtils;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.RequestBody;
-import com.squareup.okhttp.Response;
+
+//import com.squareup.okhttp.Call;
+//import com.squareup.okhttp.Callback;
+//import com.squareup.okhttp.FormEncodingBuilder;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.RequestBody;
+//import com.squareup.okhttp.Response;
 
 import java.io.IOException;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.RequestBody;
+import okhttp3.Response;
 
 public class ForgotPasswordActivity extends AppCompatActivity implements View.OnClickListener {
 
@@ -177,9 +189,39 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
 
     private static OkHttpClient okhttpclient = new OkHttpClient();
 
+//
+//    private void getData() {
+//        String url = CommonUtils.localhost+"mobileapi/register?";
+//        BaseOkHttpClient.newBuilder()
+//                .addParam("cat_id", 14137)
+//                .addParam("cur_page", 1)
+//                .addParam("size", 10)
+//                .get()
+//                .url(url)
+//                .build()
+//                .enqueue(new BaseCallBack() {
+//                    @Override
+//                    public void onSuccess(Object o) {
+////                        Toast.makeText(MainActivity.this, "成功：" + o.toString(), Toast.LENGTH_SHORT).show();
+////                        txtContent.setText(o.toString());
+//                    }
+//
+//                    @Override
+//                    public void onError(int code) {
+////                        Toast.makeText(MainActivity.this, "错误编码：" + code, Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                    @Override
+//                    public void onFailure(Call call, IOException e) {
+////                        Toast.makeText(MainActivity.this, "失败：" + e.toString(), Toast.LENGTH_SHORT).show();
+//                    }
+//                });
+//    }
+
+
     private void doRegisterQequestInvalidIDGet(String phone){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+//        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         Request request = builder.url(CommonUtils.localhost+"mobileapi/register?phone=" +phone).get().build();
@@ -191,11 +233,12 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call call, IOException e) {
                 e.printStackTrace();
             }
+
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call call, Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":0,")){
@@ -208,12 +251,32 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
                     mHandler.sendEmptyMessage(OTHER_ERROR);
                 }
             }
+
+//            @Override
+//            public void onFailure(Request request, IOException e) {
+//                e.printStackTrace();
+//            }
+//            @Override
+//            public void onResponse(Response response) throws IOException {
+//                final String res = response.body().string();
+//                Log.e("oooooooooo", "onResponse:  res = "+res );
+//                if (res.contains(":0,")){
+//                    mHandler.sendEmptyMessage(SEND_INVALID_FAILED);
+//                } else if (res.equals("") || null == res) {
+//                    mHandler.sendEmptyMessage(SERVER_EXCEPTION);
+//                } else if (res.contains(":1,")){
+//                    mHandler.sendEmptyMessage(SEND_INVALID_SUCCESS);
+//                } else {
+//                    mHandler.sendEmptyMessage(OTHER_ERROR);
+//                }
+//            }
         });
     }
 
     private void doResetPwdPost(String phone,String pwd,String verifycode){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+//        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         RequestBody requestBody = requestBodyBuilder
                 .add("phone",phone)
@@ -230,11 +293,11 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":0,")){

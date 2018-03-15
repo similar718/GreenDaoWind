@@ -23,16 +23,23 @@ import com.nedfon.nedfon.bean.SensorCollectionDataAllBean;
 import com.nedfon.nedfon.bean.SensorDataAllBean;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
-import com.squareup.okhttp.Call;
-import com.squareup.okhttp.Callback;
-import com.squareup.okhttp.FormEncodingBuilder;
-import com.squareup.okhttp.OkHttpClient;
-import com.squareup.okhttp.Request;
-import com.squareup.okhttp.Response;
+//import com.squareup.okhttp.Call;
+//import com.squareup.okhttp.Callback;
+//import com.squareup.okhttp.FormEncodingBuilder;
+//import com.squareup.okhttp.OkHttpClient;
+//import com.squareup.okhttp.Request;
+//import com.squareup.okhttp.Response;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.FormBody;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class DataSearchActivity extends BaseTopBottomActivity implements View.OnClickListener {
 
@@ -190,7 +197,7 @@ public class DataSearchActivity extends BaseTopBottomActivity implements View.On
      */
     private  void doGetsensorcollectiondataGet(String token,String deviceSn,String start,String end){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         // http://localhost:9090/mobileapi/sensorcollectiondata?token=123123&deviceSN=00002&start=2018-2-28&end=2018-3-2
@@ -207,11 +214,11 @@ public class DataSearchActivity extends BaseTopBottomActivity implements View.On
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res1 = "+res );
                 if (res.contains("\"total\":")){
@@ -235,7 +242,7 @@ public class DataSearchActivity extends BaseTopBottomActivity implements View.On
      */
     private  void doGetsensordataGet(String token,String deviceSn,String start,String end){
         //1.拿到OkHttpClient对象
-        FormEncodingBuilder requestBodyBuilder = new FormEncodingBuilder();
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
         // http://localhost:9090/mobileapi/sensordata?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTk5NTg5MjksInVzZXJuYW1lIjoiMTM1MTI3NzQ3NjAifQ.DP22dBsyMqnPoQyMw0KV51WN_OImBxI8rfphBS-eWfs
@@ -254,11 +261,11 @@ public class DataSearchActivity extends BaseTopBottomActivity implements View.On
         //异步使用CallBack  同步用call.execute()
         call.enqueue(new Callback() {
             @Override
-            public void onFailure(Request request, IOException e) {
+            public void onFailure(Call request, IOException e) {
                 e.printStackTrace();
             }
             @Override
-            public void onResponse(Response response) throws IOException {
+            public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res2 = "+res );
                 if (res.contains("\"total\":")){
