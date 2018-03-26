@@ -22,8 +22,8 @@ public class CrashHandlerApplication extends Application {
 	    mInstance = this;
 	    //Set exception handling procedures for the application here, and then our program 
 	    //can catch the exception that is not handled
-	    CrashHandler crashHandler = CrashHandler.getInstance();
-	    crashHandler.init(this);
+		CrashHandler crashHandler = CrashHandler.getInstance();
+		crashHandler.init(this);
 
 //		// 初始化ACRA
 //		ACRA.init(this);

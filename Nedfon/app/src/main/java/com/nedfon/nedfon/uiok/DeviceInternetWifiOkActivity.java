@@ -16,7 +16,6 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.espressif.iot.esptouch.EsptouchTask;
 import com.espressif.iot.esptouch.IEsptouchListener;
@@ -135,8 +134,8 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
             @Override
             public void run() {
                 String text = result.getBssid() + " is connected to the wifi";
-                Toast.makeText(DeviceInternetWifiOkActivity.this, "配网成功",
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(DeviceInternetWifiOkActivity.this, "配网成功",
+//                        Toast.LENGTH_LONG).show();
                 if (mProgressDialog.isShowing()){
                     mProgressDialog.dismiss();
                 }

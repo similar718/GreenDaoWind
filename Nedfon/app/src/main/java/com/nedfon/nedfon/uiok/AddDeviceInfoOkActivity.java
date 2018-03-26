@@ -139,24 +139,24 @@ public class AddDeviceInfoOkActivity extends BaseTopBottomActivity implements Vi
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-                    ToastUtils.show(AddDeviceInfoOkActivity.this,"绑定成功！");
-                    mBindPromptTv.setText("绑定成功");
+                    ToastUtils.show(AddDeviceInfoOkActivity.this,"操作成功！");
+                    mBindPromptTv.setText("操作成功");
                     break;
                 case 2 :
                     ToastUtils.show(AddDeviceInfoOkActivity.this,"其他错误");
                     mBindPromptTv.setText("其他错误");
                     break;
                 case 3 :
-                    ToastUtils.show(AddDeviceInfoOkActivity.this,"绑定设备不存在");
-                    mBindPromptTv.setText("绑定设备不存在！");
+                    ToastUtils.show(AddDeviceInfoOkActivity.this,"操作设备不存在");
+                    mBindPromptTv.setText("操作设备不存在！");
                     break;
                 case 4 :
                     ToastUtils.show(AddDeviceInfoOkActivity.this,"该设备已经绑定");
                     mBindPromptTv.setText("该设备已经绑定！");
                     break;
                 case 5 :
-                    ToastUtils.show(AddDeviceInfoOkActivity.this,"设置失败");
-                    mBindPromptTv.setText("设备绑定失败！");
+                    ToastUtils.show(AddDeviceInfoOkActivity.this,"操作失败");
+                    mBindPromptTv.setText("操作失败！");
                     break;
             }
         }

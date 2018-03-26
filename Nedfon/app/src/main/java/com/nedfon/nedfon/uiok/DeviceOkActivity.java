@@ -19,6 +19,7 @@ import com.nedfon.nedfon.bean.DeviceInfo;
 import com.nedfon.nedfon.bean.DeviceInfoAll;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
+import com.nedfon.nedfon.view.SwitchButton;
 //import com.squareup.okhttp.Call;
 //import com.squareup.okhttp.Callback;
 //import com.squareup.okhttp.FormEncodingBuilder;
@@ -45,7 +46,7 @@ import stomp.Stomp;
 import stomp.client.StompClient;
 import stomp.client.StompMessage;
 
-public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnClickListener {
+public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnClickListener{
 
     private TextView mShiwaiTv,mTemperatureTv,mHumidityTv,mPm25Tv;
     private RelativeLayout /*mExhaustVentilationRl,*/mParamsRl,mTimerRl;
@@ -60,6 +61,11 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
     private RelativeLayout mFengjiPowerRl;
     private ImageView mFengjiPowerKai,mFengjiPowerGuan;
+
+
+    private SwitchButton mPowerSb;
+    private SwitchButton mPaiqiHuanqiSb;
+    private SwitchButton mFuliziSb;
 
     private TextView mWuRanTxtTv;
     private TextView mBigTemperatureTv;
@@ -76,7 +82,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
     private boolean mIsStopThread = false;
     private boolean isEnd = false;
-//    private Thread mThread;
+    private Thread mThread;
 
     private StompClient mStompClient;
 
@@ -101,27 +107,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     private void createStompClient() {
         mStompClient = Stomp.over(WebSocket.class, "ws://111.231.234.151:9090/endpointWisely/websocket");//ws://111.231.234.151:9090
         mStompClient.connect();
-        //Toast.makeText(DeviceOkActivity.this,"开始连接 111.231.234.151:9090",Toast.LENGTH_SHORT).show();
-//        mStompClient.lifecycle().subscribe(new Action1<LifecycleEvent>() {
-//            @Override
-//            public void call(LifecycleEvent lifecycleEvent) {
-//                switch (lifecycleEvent.getType()) {
-//                    case OPENED:
-//                        Log.d("oooooooo", "Stomp connection opened");
-//                        toast("连接已开启");
-//                        break;
-//
-//                    case ERROR:
-//                        Log.e("oooooooo", "Stomp Error", lifecycleEvent.getException());
-//                        toast("连接出错");
-//                        break;
-//                    case CLOSED:
-//                        Log.d("oooooooo", "Stomp connection closed");
-//                        toast("连接关闭");
-//                        break;
-//                }
-//            }
-//        });
         mStompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -145,13 +130,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
     // 接收/user/xiaoli/message路径发布的消息
     private void registerStompTopic() {
-//        mStompClient.topic("/user/xiaoli/message").subscribe(new Action1<StompMessage>() {
-//            @Override
-//            public void call(StompMessage stompMessage) {
-//                Log.e("oooooooo", "call: " +stompMessage.getPayload() );
-//                showMessage(stompMessage);
-//            }
-//        });
         mStompClient.topic("/user/"+info.userphone+"/msg")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -168,28 +146,38 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     }
                     showMessage(topicMessage);
                 });
-        sendMessage();
+        mThread = new GetDeviceInfoThread();
+        mThread.start();
     }
+
+    private static int IsIntervalSendNum = 0;
 
     private void sendMessage(){
         // 向/app/cheat发送Json数据
-        mStompClient.send("/ws-push/welcome").subscribe(new Subscriber<Void>() {
+        mStompClient.send("/ws-push/welcome","{'name':"+info.userphone+"}").subscribe(new Subscriber<Void>() {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
-                        //toast("发送错误");
+                        Log.e("DeviceOkActivity","sendMessage = OnError");
                     }
                     @Override
                     public void onComplete() {
-                        //toast("发送成功");
+                        IsIntervalSendNum = 0;
+                        Log.e("DeviceOkActivity","sendMessage = onComplete");
                     }
 
                     @Override
                     public void onSubscribe(Subscription s) {
+                        IsIntervalSendNum++;
+                        Log.e("DeviceOkActivity","sendMessage = onSubscribe");
+                        if (IsIntervalSendNum>6){
+                            mHandler.sendEmptyMessage(12);
+                        }
                     }
 
                     @Override
                     public void onNext(Void aVoid) {
+                        Log.e("DeviceOkActivity","sendMessage = onNext");
                     }
                 });
     }
@@ -215,44 +203,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         });
     }
 
-
-//    private class WebSocketThread extends Thread{
-//        @Override
-//        public void run() {
-//            try {
-//                mSocketClient = new WebSocketClient(new URI("ws://10.27.0.197:2017/"), new Draft_10()) {
-//                    @Override
-//                    public void onOpen(ServerHandshake handshakedata) {
-//                        Log.d("picher_log", "打开通道" + handshakedata.getHttpStatus());
-//                        //handler.obtainMessage(0, message).sendToTarget();
-//                    }
-//
-//                    @Override
-//                    public void onMessage(String message) {
-//                        Log.d("picher_log", "接收消息" + message);
-//                        //handler.obtainMessage(0, message).sendToTarget();
-//                    }
-//
-//                    @Override
-//                    public void onClose(int code, String reason, boolean remote) {
-//                        Log.d("picher_log", "通道关闭");
-//                        //handler.obtainMessage(0, message).sendToTarget();
-//                    }
-//
-//                    @Override
-//                    public void onError(Exception ex) {
-//                        Log.d("picher_log", "链接错误");
-//                    }
-//                };
-//                mSocketClient.connect();
-//
-//            } catch (URISyntaxException e) {
-//                e.printStackTrace();
-//            }
-//        }
-//    }
-
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -267,7 +217,8 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 while (!mIsStopThread) {
                     try {
                         Thread.sleep(5 * 1000);//每10秒刷新一次  更改为5秒
-                        doDeviceInfoGet(CommonUtils.token, CommonUtils.bean.deviceid);
+//                        doDeviceInfoGet(CommonUtils.token, CommonUtils.bean.deviceid);
+                        sendMessage();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -313,7 +264,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         mTemperatureTv = this.findViewById(R.id.activity_device_temperature_tv);
         mHumidityTv = this.findViewById(R.id.activity_device_humidity_tv);
         mPm25Tv = this.findViewById(R.id.activity_device_pm25_tv);
-//        mExhaustVentilationRl = this.findViewById(R.id.activity_exhaust_ventilation_rl);
         mParamsRl = this.findViewById(R.id.activity_param_set_rl);
         mTimerRl = this.findViewById(R.id.activity_timer_set_rl);
 
@@ -338,7 +288,10 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         mExhuastVentilationRlGao = this.findViewById(R.id.exhaust_ventilation_gao_rl);
         mExhuastVentilationRlDi = this.findViewById(R.id.exhaust_ventilation_di_rl);
 
-//        mExhaustVentilationRl.setOnClickListener(this);
+        mPowerSb = this.findViewById(R.id.power_sb);
+        mPaiqiHuanqiSb = this.findViewById(R.id.paiqi_huanqi_sb);
+        mFuliziSb = this.findViewById(R.id.fulizi_sb);
+
         mExhuastVentilationRlDi.setOnClickListener(this);
         mExhuastVentilationRlGao.setOnClickListener(this);
         mParamsRl.setOnClickListener(this);
@@ -346,6 +299,55 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         mFuliziRl.setOnClickListener(this);
         mPaiqiHaunqiRl.setOnClickListener(this);
         mFengjiPowerRl.setOnClickListener(this);
+
+        mPowerSb.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                mIsIonsFlag = false;
+                mIsPower = true;
+                mIsAuto = false;
+                mIsHuanqi = false;
+                int power10 = power == 0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        isdi+"",power10+"",fulizi+"","1",power10+"");
+            }
+        });
+        mPaiqiHuanqiSb.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    mHandler.sendEmptyMessage(10);
+                    return;
+                }
+                mIsIonsFlag = false;
+                mIsPower = false;
+                mIsAuto = true;
+                mIsHuanqi = false;
+                int auto11 = auto==2?1:2;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
+                        isdi+"",power+"",fulizi+"","1",power+"");
+            }
+        });
+
+        mFuliziSb.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(SwitchButton view, boolean isChecked) {
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    mHandler.sendEmptyMessage(11);
+                    return;
+                }
+                mIsIonsFlag = true;
+                mIsPower = false;
+                mIsAuto = false;
+                mIsHuanqi = false;
+                int fulizi1 = fulizi==0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        isdi+"",power+"",fulizi1+"","1",power+"");
+            }
+        });
+
         initData();
     }
 
@@ -362,7 +364,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
             ToastUtils.show(DeviceOkActivity.this,"设备异常");
         }
         Log.e("oooooooooo","deviceid = "+info.deviceid);
-//        ToastUtils.show(DeviceOkActivity.this,info.deviceid);
         mTemperatureTv.setText(info.outtmp+"℃");
         mHumidityTv.setText(info.outsweet+"%");
         mPm25Tv.setText(info.outpm25+"");
@@ -384,36 +385,59 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         //排气换气是否自动 2 自动 1 手动
         auto = info.changeOrPushModel;
         //电源开关获取 0 关机 1 开机
-//        power = info.windstatus;
         power = info.workmodel;
 
 
         //排气换气自动 手动
         boolean paiqihuanqiisopen = auto==2?true:false; //2自动 1手动
         if (paiqihuanqiisopen){
-            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
-            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+//            mPaiqiHuanqiSb.setEnabled(true);
+            SwitchButton.flag = true;
+            mPaiqiHuanqiSb.setChecked(true);
+//            mPaiqiHuanqiSb.setEnabled(false);
+//            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
+//            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
         } else {
-            mPaiqiHaunqiAuto.setVisibility(View.GONE);
-            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+//            mPaiqiHuanqiSb.setEnabled(true);
+            SwitchButton.flag = true;
+            mPaiqiHuanqiSb.setChecked(false);
+//            mPaiqiHuanqiSb.setEnabled(false);
+//            mPaiqiHaunqiAuto.setVisibility(View.GONE);
+//            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
         }
         //负离子开关
         boolean fuliziisopen = info.ionsflag==0?false:true;
         if (fuliziisopen){
-            mFuliziKai.setVisibility(View.VISIBLE);
-            mFuliziGuan.setVisibility(View.GONE);
+//            mFuliziSb.setEnabled(true);
+            SwitchButton.flag = true;
+            mFuliziSb.setChecked(true);
+//            mFuliziSb.setEnabled(false);
+//            mFuliziKai.setVisibility(View.VISIBLE);
+//            mFuliziGuan.setVisibility(View.GONE);
         } else {
-            mFuliziKai.setVisibility(View.GONE);
-            mFuliziGuan.setVisibility(View.VISIBLE);
+//            mFuliziSb.setEnabled(true);
+            SwitchButton.flag = true;
+            mFuliziSb.setChecked(false);
+//            mFuliziSb.setEnabled(false);
+//            mFuliziKai.setVisibility(View.GONE);
+//            mFuliziGuan.setVisibility(View.VISIBLE);
         }
         //电源开关
         boolean poweropen = power ==0?false:true;
         if (poweropen){
-            mFengjiPowerKai.setVisibility(View.VISIBLE);
-            mFengjiPowerGuan.setVisibility(View.GONE);
+//            mPowerSb.setEnabled(true);
+            SwitchButton.flag = true;
+            mPowerSb.setChecked(true);
+//            mPowerSb.setEnabled(false);
+//            mFengjiPowerKai.setVisibility(View.VISIBLE);
+//            mFengjiPowerGuan.setVisibility(View.GONE);
         } else {
-            mFengjiPowerKai.setVisibility(View.GONE);
-            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+//            mPowerSb.setEnabled(true);
+            SwitchButton.flag = true;
+            mPowerSb.setChecked(false);
+//            mPowerSb.setEnabled(false);
+//            mFengjiPowerKai.setVisibility(View.GONE);
+//            mFengjiPowerGuan.setVisibility(View.VISIBLE);
         }
 
         isdi = info.workgear;
@@ -426,7 +450,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         } else {
             mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_unselect);
             mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_unselect);
-
         }
     }
 
@@ -443,14 +466,12 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     ToastUtils.show(DeviceOkActivity.this,"风机处于关机状态，不能进行设置参数！");
                     return;
                 }
-//                Log.e("oooooooooooo", "onClick: auto = "+auto);
                 if (auto == 2){
                     ToastUtils.show(DeviceOkActivity.this,"排气换气处于自动模式，不能进行设置参数！");
                     return;
                 }
                 info.ionsflag = fulizi;
                 info.changeOrPushModel = auto;
-//                info.windstatus = power;
                 info.workmodel = power;
                 CommonUtils.bean = null;
                 CommonUtils.bean = info;
@@ -465,7 +486,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 }
                 info.ionsflag = fulizi;
                 info.changeOrPushModel = auto;
-//                info.windstatus = power;
                 info.workmodel = power;
                 CommonUtils.bean = null;
                 CommonUtils.bean = info;
@@ -480,7 +500,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 }
                 info.ionsflag = fulizi;
                 info.changeOrPushModel = auto;
-//                info.windstatus = power;
                 info.workmodel = power;
                 CommonUtils.bean = null;
                 CommonUtils.bean = info;
@@ -489,46 +508,39 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 DeviceOkActivity.this.finish();
                 break;
             case R.id.fulizi_bottom_rl:
-                if (power == 0){
-                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
-                    return;
-                }
-                mIsIonsFlag = true;
-                mIsPower = false;
-                mIsAuto = false;
-                mIsHuanqi = false;
-                //int auto1 = auto==0?1:0;
-                int fulizi1 = fulizi==0?1:0;
-                //int power1 = power==0?1:0;
-                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        isdi+"",power+"",fulizi1+"","1",power+"");
+//                if (power == 0){
+//                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+//                    return;
+//                }
+//                mIsIonsFlag = true;
+//                mIsPower = false;
+//                mIsAuto = false;
+//                mIsHuanqi = false;
+//                int fulizi1 = fulizi==0?1:0;
+//                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+//                        isdi+"",power+"",fulizi1+"","1",power+"");
                 break;
             case R.id.paiqi_huanqi_bottom_rl:
-                if (power == 0){
-                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
-                    return;
-                }
-                mIsIonsFlag = false;
-                mIsPower = false;
-                mIsAuto = true;
-                mIsHuanqi = false;
-                int auto11 = auto==1?2:1;
-//                Log.e("ooooooooooooo", "onClick: auto = "+auto +" auto11 = "+auto11);
-                //int fulizi11 = fulizi==0?1:0;
-                //int power11 = power==0?1:0;
-                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
-                        isdi+"",power+"",fulizi+"","1",power+"");
+//                if (power == 0){
+//                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+//                    return;
+//                }
+//                mIsIonsFlag = false;
+//                mIsPower = false;
+//                mIsAuto = true;
+//                mIsHuanqi = false;
+//                int auto11 = auto==1?2:1;
+//                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
+//                        isdi+"",power+"",fulizi+"","1",power+"");
                 break;
             case R.id.fengji_power_rl:
-                mIsIonsFlag = false;
-                mIsPower = true;
-                mIsAuto = false;
-                mIsHuanqi = false;
-                //int auto10 = auto==0?1:0;
-                //int fulizi10 = fulizi==0?1:0;
-                int power10 = power==0?1:0;
-                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        isdi+"",power10+"",fulizi+"","1",power10+"");
+//                mIsIonsFlag = false;
+//                mIsPower = true;
+//                mIsAuto = false;
+//                mIsHuanqi = false;
+//                int power10 = power==0?1:0;
+//                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+//                        isdi+"",power10+"",fulizi+"","1",power10+"");
                 break;
 
             case R.id.exhaust_ventilation_gao_rl://高档位
@@ -678,33 +690,45 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                 case 1:
                     ToastUtils.show(DeviceOkActivity.this,"设置成功！");
                     if (mIsAuto){
-                        if (mPaiqiHaunqiAuto.getVisibility() == View.GONE){
-                            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
-                            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+                        if (auto != 2){
+                            SwitchButton.flag = true;
+                            mPaiqiHuanqiSb.setChecked(false);
+//                            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
+//                            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
                             auto = 2;
                         } else {
                             auto = 1;
-                            mPaiqiHaunqiAuto.setVisibility(View.GONE);
-                            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+                            SwitchButton.flag = true;
+                            mPaiqiHuanqiSb.setChecked(true);
+//                            mPaiqiHaunqiAuto.setVisibility(View.GONE);
+//                            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
                         }
                     } else if(mIsIonsFlag){
-                        if (mFuliziKai.getVisibility() == View.GONE){
-                            mFuliziKai.setVisibility(View.VISIBLE);
-                            mFuliziGuan.setVisibility(View.GONE);
+                        if (fulizi != 1){
+                            SwitchButton.flag = true;
+                            mFuliziSb.setChecked(true);
+//                            mFuliziKai.setVisibility(View.VISIBLE);
+//                            mFuliziGuan.setVisibility(View.GONE);
                             fulizi = 1;
                         } else {
-                            mFuliziKai.setVisibility(View.GONE);
-                            mFuliziGuan.setVisibility(View.VISIBLE);
+                            SwitchButton.flag = true;
+                            mFuliziSb.setChecked(false);
+//                            mFuliziKai.setVisibility(View.GONE);
+//                            mFuliziGuan.setVisibility(View.VISIBLE);
                             fulizi = 0;
                         }
                     } else if(mIsPower){
-                        if (mFengjiPowerKai.getVisibility() == View.GONE){
-                            mFengjiPowerKai.setVisibility(View.VISIBLE);
-                            mFengjiPowerGuan.setVisibility(View.GONE);
+                        if (power != 1){
+                            SwitchButton.flag = true;
+                            mPowerSb.setChecked(true);
+//                            mFengjiPowerKai.setVisibility(View.VISIBLE);
+//                            mFengjiPowerGuan.setVisibility(View.GONE);
                             power = 1;
                         } else {
-                            mFengjiPowerKai.setVisibility(View.GONE);
-                            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+                            SwitchButton.flag = true;
+                            mPowerSb.setChecked(false);
+//                            mFengjiPowerKai.setVisibility(View.GONE);
+//                            mFengjiPowerGuan.setVisibility(View.VISIBLE);
                             power = 0;
                         }
                     } else if(mIsHuanqi){
@@ -724,13 +748,49 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     break;
                 case 2 :
                     ToastUtils.show(DeviceOkActivity.this,"其他错误");
+                    if (mIsAuto){
+                        SwitchButton.flag = true;
+                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
+                    } else if(mIsIonsFlag){
+                        SwitchButton.flag = true;
+                        mFuliziSb.setChecked(fulizi==1?true:false);
+                    } else if(mIsPower){
+                        SwitchButton.flag = true;
+                        mPowerSb.setChecked(power == 1?true:false);
+                    }
                     break;
                 case 3 :
-//                    ToastUtils.show(DeviceOkActivity.this,"获取成功");
                     initData();
                     break;
                 case 5 :
                     ToastUtils.show(DeviceOkActivity.this,"设置失败,可能设备离线！");
+                    if (mIsAuto){
+                        SwitchButton.flag = true;
+                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
+                    } else if(mIsIonsFlag){
+                        SwitchButton.flag = true;
+                        mFuliziSb.setChecked(fulizi==1?true:false);
+                    } else if(mIsPower){
+                        SwitchButton.flag = true;
+                        mPowerSb.setChecked(power == 1?true:false);
+                    }
+                    break;
+
+                case 10:
+                    SwitchButton.flag = true;
+                    mPaiqiHuanqiSb.setChecked(auto == 2?true:false);
+                    break;
+
+                case 11:
+                    SwitchButton.flag = true;
+                    mFuliziSb.setChecked(fulizi==1?true:false);
+                    break;
+
+                case 12:
+                    //创建client 实例
+                    createStompClient();
+                    //订阅消息
+                    registerStompTopic();
                     break;
             }
         }

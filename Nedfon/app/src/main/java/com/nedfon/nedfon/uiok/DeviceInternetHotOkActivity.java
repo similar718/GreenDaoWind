@@ -80,7 +80,6 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
         NAME = DeviceInternetHotOkActivity.class.getSimpleName();
         setImage(2);
 
-
         primissionAsk();
 
         mWifiAdmin = new EspWifiAdminSimple(this);
@@ -196,8 +195,8 @@ public class DeviceInternetHotOkActivity extends BaseTopBottomActivity implement
             @Override
             public void run() {
                 String text = result.getBssid() + " is connected to the wifi";
-                Toast.makeText(DeviceInternetHotOkActivity.this, "配网成功",
-                        Toast.LENGTH_LONG).show();
+//                Toast.makeText(DeviceInternetHotOkActivity.this, "配网成功",
+//                        Toast.LENGTH_LONG).show();
                 if (mProgressDialog.isShowing()){
                     mProgressDialog.dismiss();
                 }

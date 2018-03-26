@@ -111,7 +111,7 @@
                     android:id="@+id/activity_params_setting_teperature_add_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/add_icon"
+                    android:src="@drawable/add1_icon"
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     />
@@ -119,7 +119,7 @@
                     android:id="@+id/activity_params_setting_teperature_reduce_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/reduce_icon"
+                    android:src="@drawable/reduce1_icon"
                     android:layout_marginLeft="150dp"
                     android:layout_centerVertical="true"
                     />
@@ -185,7 +185,7 @@
                     android:id="@+id/activity_params_setting_humidity_add_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/add_icon"
+                    android:src="@drawable/add1_icon"
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     />
@@ -193,7 +193,7 @@
                     android:id="@+id/activity_params_setting_humidity_reduce_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/reduce_icon"
+                    android:src="@drawable/reduce1_icon"
                     android:layout_marginLeft="150dp"
                     android:layout_centerVertical="true"
                     />
@@ -260,7 +260,7 @@
                     android:id="@+id/activity_params_setting_pm25_add_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/add_icon"
+                    android:src="@drawable/add1_icon"
                     android:layout_marginLeft="10dp"
                     android:layout_centerVertical="true"
                     />
@@ -268,7 +268,7 @@
                     android:id="@+id/activity_params_setting_pm25_reduce_iv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:src="@drawable/reduce_icon"
+                    android:src="@drawable/reduce1_icon"
                     android:layout_marginLeft="150dp"
                     android:layout_centerVertical="true"
                     />

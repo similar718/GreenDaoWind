@@ -111,13 +111,13 @@
                     android:id="@+id/activity_timer_setting_start_btn_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/set_bg"
-                    android:layout_marginLeft="120dp"
+                    android:background="@drawable/week_selected_bg"
+                    android:layout_marginLeft="110dp"
                     android:layout_centerVertical="true"
                     android:text="设置"
                     android:gravity="center"
                     android:textColor="@color/white"
-                    android:textSize="8sp"
+                    android:textSize="14sp"
                     />
                 <TextView
                     android:id="@+id/activity_timer_setting_start_tv"
@@ -180,13 +180,13 @@
                     android:id="@+id/activity_timer_setting_end_btn_tv"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:background="@drawable/set_bg"
-                    android:layout_marginLeft="120dp"
+                    android:background="@drawable/week_selected_bg"
+                    android:layout_marginLeft="110dp"
                     android:layout_centerVertical="true"
                     android:text="设置"
                     android:gravity="center"
                     android:textColor="@color/white"
-                    android:textSize="8sp"
+                    android:textSize="14sp"
                     />
                 <TextView
                     android:id="@+id/activity_timer_setting_end_tv"

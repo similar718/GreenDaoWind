@@ -19,6 +19,7 @@ import com.nedfon.nedfon.bean.DeviceInfoAll;
 import com.nedfon.nedfon.bean.GetPersonInfoAllBean;
 import com.nedfon.nedfon.db.MyDBHelper;
 import com.nedfon.nedfon.ui.LoginActivity;
+import com.nedfon.nedfon.ui.ResetPwdActivity;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 //import com.squareup.okhttp.Call;
@@ -135,6 +136,9 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
                 startActivity(msgcenter);
                 break;
             case R.id.fragment_personal_center_update_pwd_rl://修改密码RL TODO
+                Intent resetpwd = new Intent(PersonalCenterOkActivity.this, ResetPwdActivity.class);
+                startActivity(resetpwd);
+                this.finish();
                 break;
             case R.id.fragment_personal_center_info_right_iv://个人中心IV
                 Intent information1 = new Intent(PersonalCenterOkActivity.this, MyInformationOkActivity.class);
@@ -145,6 +149,9 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
                 startActivity(msgcenter1);
                 break;
             case R.id.fragment_personal_center_update_pwd_right_iv://修改密码IV
+                Intent resetpwd1 = new Intent(PersonalCenterOkActivity.this, ResetPwdActivity.class);
+                startActivity(resetpwd1);
+                this.finish();
                 break;
             default:
                 break;

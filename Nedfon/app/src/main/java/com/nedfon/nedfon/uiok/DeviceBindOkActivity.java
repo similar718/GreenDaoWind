@@ -14,6 +14,8 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
@@ -25,12 +27,7 @@ import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.NetWorkUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 import com.nedfon.nedfon.view.DeviceSetInternetDialog;
-//import com.squareup.okhttp.Call;
-//import com.squareup.okhttp.Callback;
-//import com.squareup.okhttp.FormEncodingBuilder;
-//import com.squareup.okhttp.OkHttpClient;
-//import com.squareup.okhttp.Request;
-//import com.squareup.okhttp.Response;
+import com.nedfon.nedfon.view.SwitchButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -45,7 +42,6 @@ import okhttp3.Response;
 
 public class DeviceBindOkActivity extends BaseBottomActivity {
 
-
     private ImageView mWeatherIv;//天气图标
     private TextView mWeatherNumTv; //天气温度度数
     private TextView mWeatherTxtTv; //天气文字描述  多云|微风
@@ -59,11 +55,19 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
     private DeviceBindAdapter mAdapter;
     private List<DeviceBindBean_test> mList;
 
+    private Thread mThread;
+    private boolean mIsStopThread = false;
+    private boolean isEnd = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initView();
+
+        mThread = new GetDeviceInfoThread();
+        mThread.start();
+
         NAME = DeviceBindOkActivity.class.getSimpleName();
         setImage(3);
         Log.e("oooooooooo", "onCreateView: token = "+ CommonUtils.token);
@@ -71,6 +75,22 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             CommonUtils.token = getSharedPreferences("nedfon",MODE_PRIVATE).getString("token", "");
         doGetCurrentWeatherGet(CommonUtils.token);
     }
+
+    private class GetDeviceInfoThread extends Thread{
+        @Override
+        public void run() {
+            while(!isEnd) {
+                while (!mIsStopThread) {
+                    try {
+                        Thread.sleep(5 * 1000);//每10秒刷新一次  更改为5秒
+                        doDeviceListGet(CommonUtils.token);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        }
+    };
 
     @Override
     protected int getLayoutRes() {
@@ -102,6 +122,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
     @Override
     protected void onRestart() {
         super.onRestart();
+        mIsStopThread = false;
         mHandler.sendEmptyMessage(6);
     }
 
@@ -132,7 +153,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                if (mlistbean.data.get(position).commStatus==1){ //在线
+//                if (mlistbean.data.get(position).commStatus==1){ //在线
                     CommonUtils.bean = null;
                     CommonUtils.bean = mlistbean.data.get(position);
                     SharedPreferences sp = getSharedPreferences("nedfon",MODE_PRIVATE);
@@ -142,14 +163,14 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                     Intent intent = new Intent(DeviceBindOkActivity.this,DeviceOkActivity.class);
                     startActivity(intent);
                     DeviceBindOkActivity.this.finish();
-                } else { //离线
-                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            isWIFIOrOther();
-                        }
-                    });
-                }
+//                } else { //离线
+//                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            isWIFIOrOther();
+//                        }
+//                    });
+//                }
             }
         });
     }
@@ -225,6 +246,24 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                 }
             }
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        mIsStopThread = false;
+    }
+
+    @Override
+    protected void onStop() {
+        super.onStop();
+        mIsStopThread = true;
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        isEnd = true;
     }
 
     /**
