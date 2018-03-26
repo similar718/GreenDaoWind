@@ -14,8 +14,6 @@ import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.widget.ToggleButton;
 
 import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
@@ -27,7 +25,6 @@ import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.NetWorkUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 import com.nedfon.nedfon.view.DeviceSetInternetDialog;
-import com.nedfon.nedfon.view.SwitchButton;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -153,7 +150,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-//                if (mlistbean.data.get(position).commStatus==1){ //在线
+                if (mlistbean.data.get(position).commStatus==1){ //在线
                     CommonUtils.bean = null;
                     CommonUtils.bean = mlistbean.data.get(position);
                     SharedPreferences sp = getSharedPreferences("nedfon",MODE_PRIVATE);
@@ -163,14 +160,14 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                     Intent intent = new Intent(DeviceBindOkActivity.this,DeviceOkActivity.class);
                     startActivity(intent);
                     DeviceBindOkActivity.this.finish();
-//                } else { //离线
-//                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
-//                        @Override
-//                        public void onClick(View v) {
-//                            isWIFIOrOther();
-//                        }
-//                    });
-//                }
+                } else { //离线
+                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            isWIFIOrOther();
+                        }
+                    });
+                }
             }
         });
     }

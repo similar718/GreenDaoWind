@@ -127,6 +127,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     }
                 });
     }
+private boolean isInit = true;
 
     // 接收/user/xiaoli/message路径发布的消息
     private void registerStompTopic() {
@@ -146,11 +147,15 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     }
                     showMessage(topicMessage);
                 });
-        mThread = new GetDeviceInfoThread();
-        mThread.start();
+        if (isInit) {
+            isInit = false;
+            mThread = new GetDeviceInfoThread();
+            mThread.start();
+        }
     }
 
     private static int IsIntervalSendNum = 0;
+    private static int num = 0;
 
     private void sendMessage(){
         // 向/app/cheat发送Json数据
@@ -170,8 +175,13 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
                     public void onSubscribe(Subscription s) {
                         IsIntervalSendNum++;
                         Log.e("DeviceOkActivity","sendMessage = onSubscribe");
-                        if (IsIntervalSendNum>6){
-                            mHandler.sendEmptyMessage(12);
+                        if (IsIntervalSendNum>10){
+                            if (num<5) {
+                                num++;
+                                mHandler.sendEmptyMessage(12);
+                            } else {
+                                setBackOnClick();
+                            }
                         }
                     }
 
