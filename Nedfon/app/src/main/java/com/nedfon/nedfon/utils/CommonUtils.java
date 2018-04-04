@@ -16,7 +16,12 @@ import java.util.regex.Pattern;
 
 public class CommonUtils {
 
-    public static final String localhost = "http://111.231.234.151:9090/"; // TODO 更换地址http://39.108.215.34:8080/
+//    public static final String localhost = "http://111.231.234.151:9090/"; // TODO 更换地址http://39.108.215.34:8080/  http://39.108.215.34:8080
+//    public static final String localhostwebsocket = "ws://111.231.234.151:9090/endpointWisely/websocket"; // TODO 更换地址39.108.215.34:8080
+
+    public static final String localhost = "http://39.108.215.34:8080/"; // TODO 更换地址http://39.108.215.34:8080/  http://39.108.215.34:8080
+    public static final String localhostwebsocket = "ws://139.108.215.34:8080/endpointWisely/websocket"; // TODO 更换地址39.108.215.34:8080
+
 //    public static final String localhost = "http://111.231.234.151:8234/";
 
     public static String token = "";

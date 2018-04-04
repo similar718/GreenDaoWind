@@ -263,7 +263,7 @@
                                 android:id="@+id/fengji_power_kai_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="关"
+                                android:text="开"
                                 android:textSize="12sp"
                                 android:textColor="@color/text_gray"
                                 android:layout_centerVertical="true"
@@ -274,6 +274,7 @@
                                 android:layout_height="wrap_content"
                                 app:sb_show_indicator="false"
                                 app:sb_checked="true"
+                                android:visibility="gone"
                                 android:layout_marginLeft="5dp"
                                 android:layout_toRightOf="@+id/fengji_power_kai_tv"
                                 />
@@ -283,7 +284,7 @@
                                 android:layout_height="wrap_content"
                                 android:layout_marginLeft="5dp"
                                 android:layout_toRightOf="@+id/fengji_power_kai_tv"
-                                android:visibility="gone"
+                                android:visibility="visible"
                                 >
                                 <ImageView
                                     android:id="@+id/fengji_power_iv"
@@ -296,7 +297,7 @@
                                     android:id="@+id/activity_device_fengji_power_kai_iv"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/on_off_btn_cricle"
+                                    android:src="@drawable/on_off_off_icon"
                                     android:layout_marginTop="4dp"
                                     android:layout_marginLeft="-2dp"
                                     android:visibility="visible"
@@ -305,7 +306,7 @@
                                     android:id="@+id/activity_device_fengji_power_guan_iv"
                                     android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:src="@drawable/on_off_btn_cricle"
+                                    android:src="@drawable/on_off_off_icon"
                                     android:layout_marginTop="4dp"
                                     android:layout_marginRight="-2dp"
                                     android:layout_alignRight="@+id/fengji_power_iv"
@@ -317,10 +318,10 @@
                                 android:id="@+id/fengji_power_guan_tv"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:text="开"
+                                android:text="关"
                                 android:textColor="@color/text_gray"
                                 android:layout_centerVertical="true"
-                                android:layout_toRightOf="@+id/power_sb"
+                                android:layout_toRightOf="@+id/power_bg_rl"
                                 android:textSize="12sp"
                                 android:layout_marginLeft="5dp"
                                 />
@@ -528,6 +529,7 @@
                         android:layout_height="wrap_content"
                         app:sb_show_indicator="false"
                         app:sb_checked="true"
+                        android:visibility="gone"
                         android:layout_marginLeft="5dp"
                         android:layout_toRightOf="@+id/shoudong_tv"
                         />
@@ -538,7 +540,7 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:layout_toRightOf="@+id/shoudong_tv"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         >
                         <ImageView
                             android:id="@+id/paiqi_huanqi_iv"
@@ -551,7 +553,7 @@
                             android:id="@+id/activity_device_paiqi_huanqi_shoudong_iv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/on_off_btn_cricle"
+                            android:src="@drawable/on_off_off_icon"
                             android:layout_marginTop="4dp"
                             android:layout_marginLeft="-2dp"
                             />
@@ -559,7 +561,7 @@
                             android:id="@+id/activity_device_paiqi_huanqi_zidong_iv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/on_off_btn_cricle"
+                            android:src="@drawable/on_off_off_icon"
                             android:layout_marginTop="4dp"
                             android:layout_marginRight="-2dp"
                             android:layout_alignRight="@+id/paiqi_huanqi_iv"
@@ -574,7 +576,7 @@
                         android:text="自动"
                         android:textColor="@color/text_gray"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/paiqi_huanqi_sb"
+                        android:layout_toRightOf="@+id/paiqi_huanqi_bg_rl"
                         android:textSize="12sp"
                         android:layout_marginLeft="5dp"
                         />
@@ -625,7 +627,7 @@
                         android:id="@+id/kai_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="关"
+                        android:text="开"
                         android:textColor="@color/text_gray"
                         android:layout_centerVertical="true"
                         android:textSize="12sp"
@@ -636,6 +638,7 @@
                         android:layout_height="wrap_content"
                         app:sb_show_indicator="false"
                         android:layout_marginLeft="5dp"
+                        android:visibility="gone"
                         android:layout_toRightOf="@+id/kai_tv"
                         />
                     <RelativeLayout
@@ -644,33 +647,33 @@
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="5dp"
                         android:layout_toRightOf="@+id/kai_tv"
-                        android:visibility="gone"
+                        android:visibility="visible"
                         >
                         <ImageView
-                            android:id="@+id/kaiguan_iv"
+                            android:id="@+id/activity_device_fulizi_kaiguan_iv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:src="@drawable/on_off_btn_bg"
                             android:layout_centerInParent="true"
-                            android:visibility="gone"
+                            android:visibility="visible"
                             />
                         <ImageView
                             android:id="@+id/activity_device_fulizi_kai_iv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/on_off_btn_cricle"
+                            android:src="@drawable/on_off_off_icon"
                             android:layout_marginTop="4dp"
                             android:layout_marginLeft="-2dp"
-                            android:visibility="gone"
+                            android:visibility="visible"
                             />
                         <ImageView
                             android:id="@+id/activity_device_fulizi_guan_iv"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:src="@drawable/on_off_btn_cricle"
+                            android:src="@drawable/on_off_off_icon"
                             android:layout_marginTop="4dp"
                             android:layout_marginRight="-2dp"
-                            android:layout_alignRight="@+id/kaiguan_iv"
+                            android:layout_alignRight="@+id/activity_device_fulizi_kaiguan_iv"
                             android:visibility="gone"
                             />
                     </RelativeLayout>
@@ -679,10 +682,10 @@
                         android:id="@+id/guan_tv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="开"
+                        android:text="关"
                         android:textColor="@color/text_gray"
                         android:layout_centerVertical="true"
-                        android:layout_toRightOf="@+id/fulizi_sb"
+                        android:layout_toRightOf="@+id/fulizi_bg_rl"
                         android:textSize="12sp"
                         android:layout_marginLeft="5dp"
                         />

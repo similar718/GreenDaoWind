@@ -1,6 +1,5 @@
 package com.nedfon.nedfon.uiok;
 
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Message;
@@ -11,7 +10,6 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
@@ -20,12 +18,6 @@ import com.nedfon.nedfon.bean.DeviceInfoAll;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 import com.nedfon.nedfon.view.SwitchButton;
-//import com.squareup.okhttp.Call;
-//import com.squareup.okhttp.Callback;
-//import com.squareup.okhttp.FormEncodingBuilder;
-//import com.squareup.okhttp.OkHttpClient;
-//import com.squareup.okhttp.Request;
-//import com.squareup.okhttp.Response;
 
 import org.java_websocket.WebSocket;
 import org.reactivestreams.Subscriber;
@@ -41,7 +33,6 @@ import okhttp3.FormBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-import stomp.LifecycleEvent;
 import stomp.Stomp;
 import stomp.client.StompClient;
 import stomp.client.StompMessage;
@@ -54,13 +45,13 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     private RelativeLayout mExhuastVentilationRlDi,mExhuastVentilationRlGao;
 
     private RelativeLayout mFuliziRl;
-    private ImageView mFuliziKai,mFuliziGuan;
+    private ImageView mFuliziKai,mFuliziGuan,mFuliziBg;
 
     private RelativeLayout mPaiqiHaunqiRl;
-    private ImageView mPaiqiHaunqiAuto,mPaiqiHaunqiNoAuto;
+    private ImageView mPaiqiHaunqiAuto,mPaiqiHaunqiNoAuto,mPaiqiHuanqiBg;
 
     private RelativeLayout mFengjiPowerRl;
-    private ImageView mFengjiPowerKai,mFengjiPowerGuan;
+    private ImageView mFengjiPowerKai,mFengjiPowerGuan,mFengjiPowerBg;
 
 
     private SwitchButton mPowerSb;
@@ -80,6 +71,8 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     private int isdi = 0;
     private int misdi = 0;
 
+    private String DeviceSN = "";
+
     private boolean mIsStopThread = false;
     private boolean isEnd = false;
     private Thread mThread;
@@ -94,6 +87,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         setTitleText("设 备");
 
         initView();
+        DeviceSN = CommonUtils.bean.deviceid;
 //        mThread = new GetDeviceInfoThread();
 //        mThread.start();
 
@@ -105,7 +99,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
 
     private void createStompClient() {
-        mStompClient = Stomp.over(WebSocket.class, "ws://111.231.234.151:9090/endpointWisely/websocket");//ws://111.231.234.151:9090
+        mStompClient = Stomp.over(WebSocket.class, CommonUtils.localhostwebsocket);//ws://111.231.234.151:9090
         mStompClient.connect();
         mStompClient.lifecycle()
                 .subscribeOn(Schedulers.io())
@@ -139,7 +133,10 @@ private boolean isInit = true;
                     String res = topicMessage.getPayload();
                     if (res.contains(":1,")){
                         DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
-                        if (CommonUtils.bean != info.data) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
+                        if (info == null){
+                            return;
+                        }
+                        if (CommonUtils.bean != info.data && info.data.deviceid.equals(DeviceSN)) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
                             CommonUtils.bean = null;
                             CommonUtils.bean = info.data;
                             mHandler.sendEmptyMessage(3);
@@ -159,7 +156,7 @@ private boolean isInit = true;
 
     private void sendMessage(){
         // 向/app/cheat发送Json数据
-        mStompClient.send("/ws-push/welcome","{'name':"+info.userphone+"}").subscribe(new Subscriber<Void>() {
+        mStompClient.send("/ws-push/welcome","{'name':'"+info.userphone+"'}").subscribe(new Subscriber<Void>() {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
@@ -280,14 +277,17 @@ private boolean isInit = true;
         mFuliziRl = this.findViewById(R.id.fulizi_bottom_rl);
         mFuliziKai = this.findViewById(R.id.activity_device_fulizi_kai_iv);
         mFuliziGuan = this.findViewById(R.id.activity_device_fulizi_guan_iv);
+        mFuliziBg = this.findViewById(R.id.activity_device_fulizi_kaiguan_iv);
 
         mFengjiPowerRl = this.findViewById(R.id.fengji_power_rl);
         mFengjiPowerKai = this.findViewById(R.id.activity_device_fengji_power_kai_iv);
         mFengjiPowerGuan = this.findViewById(R.id.activity_device_fengji_power_guan_iv);
+        mFengjiPowerBg = this.findViewById(R.id.fengji_power_iv);
 
         mPaiqiHaunqiRl = this.findViewById(R.id.paiqi_huanqi_bottom_rl);
         mPaiqiHaunqiAuto = this.findViewById(R.id.activity_device_paiqi_huanqi_zidong_iv);
         mPaiqiHaunqiNoAuto = this.findViewById(R.id.activity_device_paiqi_huanqi_shoudong_iv);
+        mPaiqiHuanqiBg = this.findViewById(R.id.paiqi_huanqi_iv);
 
         mWuRanTxtTv = this.findViewById(R.id.activity_device_wuran_tv);
         mBigTemperatureTv = this.findViewById(R.id.activity_device_big_temperature_tv);
@@ -326,8 +326,9 @@ private boolean isInit = true;
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (power == 0){
+                    SwitchButton.flag = true;
+                    mPaiqiHuanqiSb.setChecked(auto == 2?true:false);
                     ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
-                    mHandler.sendEmptyMessage(10);
                     return;
                 }
                 mIsIonsFlag = false;
@@ -344,8 +345,9 @@ private boolean isInit = true;
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
                 if (power == 0){
+                    SwitchButton.flag = true;
+                    mFuliziSb.setChecked(fulizi==1?true:false);
                     ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
-                    mHandler.sendEmptyMessage(11);
                     return;
                 }
                 mIsIonsFlag = true;
@@ -399,55 +401,61 @@ private boolean isInit = true;
 
 
         //排气换气自动 手动
-        boolean paiqihuanqiisopen = auto==2?true:false; //2自动 1手动
-        if (paiqihuanqiisopen){
+//        boolean paiqihuanqiisopen = auto==2?true:false; //2自动 1手动
+        if (auto == 2){
 //            mPaiqiHuanqiSb.setEnabled(true);
-            SwitchButton.flag = true;
-            mPaiqiHuanqiSb.setChecked(true);
+//            SwitchButton.flag = true;
+//            mPaiqiHuanqiSb.setChecked(true);
 //            mPaiqiHuanqiSb.setEnabled(false);
-//            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
-//            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
+            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+            mPaiqiHuanqiBg.setImageResource(R.drawable.on_off_btn_bg);
         } else {
 //            mPaiqiHuanqiSb.setEnabled(true);
-            SwitchButton.flag = true;
-            mPaiqiHuanqiSb.setChecked(false);
+//            SwitchButton.flag = true;
+//            mPaiqiHuanqiSb.setChecked(false);
 //            mPaiqiHuanqiSb.setEnabled(false);
-//            mPaiqiHaunqiAuto.setVisibility(View.GONE);
-//            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+            mPaiqiHaunqiAuto.setVisibility(View.GONE);
+            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+            mPaiqiHuanqiBg.setImageResource(R.drawable.kai1_icon);
         }
         //负离子开关
-        boolean fuliziisopen = info.ionsflag==0?false:true;
-        if (fuliziisopen){
+//        boolean fuliziisopen = info.ionsflag==1?true:false;
+        if (fulizi == 1){
 //            mFuliziSb.setEnabled(true);
-            SwitchButton.flag = true;
-            mFuliziSb.setChecked(true);
+//            SwitchButton.flag = true;
+//            mFuliziSb.setChecked(true);
 //            mFuliziSb.setEnabled(false);
-//            mFuliziKai.setVisibility(View.VISIBLE);
-//            mFuliziGuan.setVisibility(View.GONE);
+            mFuliziKai.setVisibility(View.VISIBLE);
+            mFuliziGuan.setVisibility(View.GONE);
+            mFuliziBg.setImageResource(R.drawable.kai1_icon);
         } else {
 //            mFuliziSb.setEnabled(true);
-            SwitchButton.flag = true;
-            mFuliziSb.setChecked(false);
+//            SwitchButton.flag = true;
+//            mFuliziSb.setChecked(false);
 //            mFuliziSb.setEnabled(false);
-//            mFuliziKai.setVisibility(View.GONE);
-//            mFuliziGuan.setVisibility(View.VISIBLE);
+            mFuliziKai.setVisibility(View.GONE);
+            mFuliziGuan.setVisibility(View.VISIBLE);
+            mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
         }
         //电源开关
         boolean poweropen = power ==0?false:true;
         if (poweropen){
 //            mPowerSb.setEnabled(true);
-            SwitchButton.flag = true;
-            mPowerSb.setChecked(true);
+//            SwitchButton.flag = true;
+//            mPowerSb.setChecked(true);
 //            mPowerSb.setEnabled(false);
-//            mFengjiPowerKai.setVisibility(View.VISIBLE);
-//            mFengjiPowerGuan.setVisibility(View.GONE);
+            mFengjiPowerKai.setVisibility(View.VISIBLE);
+            mFengjiPowerGuan.setVisibility(View.GONE);
+            mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
         } else {
 //            mPowerSb.setEnabled(true);
-            SwitchButton.flag = true;
-            mPowerSb.setChecked(false);
+//            SwitchButton.flag = true;
+//            mPowerSb.setChecked(false);
 //            mPowerSb.setEnabled(false);
-//            mFengjiPowerKai.setVisibility(View.GONE);
-//            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+            mFengjiPowerKai.setVisibility(View.GONE);
+            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+            mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
         }
 
         isdi = info.workgear;
@@ -518,39 +526,39 @@ private boolean isInit = true;
                 DeviceOkActivity.this.finish();
                 break;
             case R.id.fulizi_bottom_rl:
-//                if (power == 0){
-//                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
-//                    return;
-//                }
-//                mIsIonsFlag = true;
-//                mIsPower = false;
-//                mIsAuto = false;
-//                mIsHuanqi = false;
-//                int fulizi1 = fulizi==0?1:0;
-//                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-//                        isdi+"",power+"",fulizi1+"","1",power+"");
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    return;
+                }
+                mIsIonsFlag = true;
+                mIsPower = false;
+                mIsAuto = false;
+                mIsHuanqi = false;
+                int fulizi1 = fulizi==0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        isdi+"",power+"",fulizi1+"","1",power+"");
                 break;
             case R.id.paiqi_huanqi_bottom_rl:
-//                if (power == 0){
-//                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
-//                    return;
-//                }
-//                mIsIonsFlag = false;
-//                mIsPower = false;
-//                mIsAuto = true;
-//                mIsHuanqi = false;
-//                int auto11 = auto==1?2:1;
-//                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
-//                        isdi+"",power+"",fulizi+"","1",power+"");
+                if (power == 0){
+                    ToastUtils.show(DeviceOkActivity.this,"风机出于关机状态，不能进行设置参数！");
+                    return;
+                }
+                mIsIonsFlag = false;
+                mIsPower = false;
+                mIsAuto = true;
+                mIsHuanqi = false;
+                int auto11 = auto==1?2:1;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
+                        isdi+"",power+"",fulizi+"","1",power+"");
                 break;
             case R.id.fengji_power_rl:
-//                mIsIonsFlag = false;
-//                mIsPower = true;
-//                mIsAuto = false;
-//                mIsHuanqi = false;
-//                int power10 = power==0?1:0;
-//                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-//                        isdi+"",power10+"",fulizi+"","1",power10+"");
+                mIsIonsFlag = false;
+                mIsPower = true;
+                mIsAuto = false;
+                mIsHuanqi = false;
+                int power10 = power==0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        isdi+"",power10+"",fulizi+"","1",power10+"");
                 break;
 
             case R.id.exhaust_ventilation_gao_rl://高档位
@@ -624,7 +632,7 @@ private boolean isInit = true;
                 Log.e("oooooooooo", "onResponse:  res = "+res );
                 if (res.contains(":1,")){
                     DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
-                    if (CommonUtils.bean != info.data) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
+                    if (CommonUtils.bean != info.data && info.data.deviceid.equals(DeviceSN)) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
                         CommonUtils.bean = null;
                         CommonUtils.bean = info.data;
                         mHandler.sendEmptyMessage(3);
@@ -664,6 +672,8 @@ private boolean isInit = true;
         FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
+        Log.e("-----------",CommonUtils.localhost+"mobileapi/controlWindCmd?" +
+                "token="+token+"&deviceSN="+deviceSN+"&OnOff="+OnOff+"&fanModel="+fanModel+"&fanLevel="+fanLevel+"&fanOnOff="+fanOnOff+"&ionsOnOff="+ionsOnOff+"&warnflag="+warnflag);
         Request request = builder.url(CommonUtils.localhost+"mobileapi/controlWindCmd?" +
                 "token="+token+"&deviceSN="+deviceSN+"&OnOff="+OnOff+"&fanModel="+fanModel+"&fanLevel="+fanLevel+"&fanOnOff="+fanOnOff+"&ionsOnOff="+ionsOnOff+"&warnflag="+warnflag).get().build();
         executeControlWindCmdRequest(request);
@@ -701,44 +711,50 @@ private boolean isInit = true;
                     ToastUtils.show(DeviceOkActivity.this,"设置成功！");
                     if (mIsAuto){
                         if (auto != 2){
-                            SwitchButton.flag = true;
-                            mPaiqiHuanqiSb.setChecked(false);
-//                            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
-//                            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+//                            SwitchButton.flag = true;
+//                            mPaiqiHuanqiSb.setChecked(false);
+                            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
+                            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+                            mPaiqiHuanqiBg.setImageResource(R.drawable.on_off_btn_bg);
                             auto = 2;
                         } else {
                             auto = 1;
-                            SwitchButton.flag = true;
-                            mPaiqiHuanqiSb.setChecked(true);
-//                            mPaiqiHaunqiAuto.setVisibility(View.GONE);
-//                            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+//                            SwitchButton.flag = true;
+//                            mPaiqiHuanqiSb.setChecked(true);
+                            mPaiqiHaunqiAuto.setVisibility(View.GONE);
+                            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+                            mPaiqiHuanqiBg.setImageResource(R.drawable.kai1_icon);
                         }
                     } else if(mIsIonsFlag){
                         if (fulizi != 1){
-                            SwitchButton.flag = true;
-                            mFuliziSb.setChecked(true);
-//                            mFuliziKai.setVisibility(View.VISIBLE);
-//                            mFuliziGuan.setVisibility(View.GONE);
+//                            SwitchButton.flag = true;
+//                            mFuliziSb.setChecked(true);
+                            mFuliziKai.setVisibility(View.VISIBLE);
+                            mFuliziGuan.setVisibility(View.GONE);
+                            mFuliziBg.setImageResource(R.drawable.kai1_icon);
                             fulizi = 1;
                         } else {
-                            SwitchButton.flag = true;
-                            mFuliziSb.setChecked(false);
-//                            mFuliziKai.setVisibility(View.GONE);
-//                            mFuliziGuan.setVisibility(View.VISIBLE);
+//                            SwitchButton.flag = true;
+//                            mFuliziSb.setChecked(false);
+                            mFuliziKai.setVisibility(View.GONE);
+                            mFuliziGuan.setVisibility(View.VISIBLE);
+                            mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
                             fulizi = 0;
                         }
                     } else if(mIsPower){
                         if (power != 1){
-                            SwitchButton.flag = true;
-                            mPowerSb.setChecked(true);
-//                            mFengjiPowerKai.setVisibility(View.VISIBLE);
-//                            mFengjiPowerGuan.setVisibility(View.GONE);
+//                            SwitchButton.flag = true;
+//                            mPowerSb.setChecked(true);
+                            mFengjiPowerKai.setVisibility(View.VISIBLE);
+                            mFengjiPowerGuan.setVisibility(View.GONE);
+                            mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
                             power = 1;
                         } else {
-                            SwitchButton.flag = true;
-                            mPowerSb.setChecked(false);
-//                            mFengjiPowerKai.setVisibility(View.GONE);
-//                            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+//                            SwitchButton.flag = true;
+//                            mPowerSb.setChecked(false);
+                            mFengjiPowerKai.setVisibility(View.GONE);
+                            mFengjiPowerGuan.setVisibility(View.VISIBLE);
+                            mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
                             power = 0;
                         }
                     } else if(mIsHuanqi){
@@ -758,32 +774,32 @@ private boolean isInit = true;
                     break;
                 case 2 :
                     ToastUtils.show(DeviceOkActivity.this,"其他错误");
-                    if (mIsAuto){
-                        SwitchButton.flag = true;
-                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
-                    } else if(mIsIonsFlag){
-                        SwitchButton.flag = true;
-                        mFuliziSb.setChecked(fulizi==1?true:false);
-                    } else if(mIsPower){
-                        SwitchButton.flag = true;
-                        mPowerSb.setChecked(power == 1?true:false);
-                    }
+//                    if (mIsAuto){
+//                        SwitchButton.flag = true;
+//                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
+//                    } else if(mIsIonsFlag){
+//                        SwitchButton.flag = true;
+//                        mFuliziSb.setChecked(fulizi==1?true:false);
+//                    } else if(mIsPower){
+//                        SwitchButton.flag = true;
+//                        mPowerSb.setChecked(power == 1?true:false);
+//                    }
                     break;
                 case 3 :
                     initData();
                     break;
                 case 5 :
                     ToastUtils.show(DeviceOkActivity.this,"设置失败,可能设备离线！");
-                    if (mIsAuto){
-                        SwitchButton.flag = true;
-                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
-                    } else if(mIsIonsFlag){
-                        SwitchButton.flag = true;
-                        mFuliziSb.setChecked(fulizi==1?true:false);
-                    } else if(mIsPower){
-                        SwitchButton.flag = true;
-                        mPowerSb.setChecked(power == 1?true:false);
-                    }
+//                    if (mIsAuto){
+//                        SwitchButton.flag = true;
+//                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
+//                    } else if(mIsIonsFlag){
+//                        SwitchButton.flag = true;
+//                        mFuliziSb.setChecked(fulizi==1?true:false);
+//                    } else if(mIsPower){
+//                        SwitchButton.flag = true;
+//                        mPowerSb.setChecked(power == 1?true:false);
+//                    }
                     break;
 
                 case 10:
