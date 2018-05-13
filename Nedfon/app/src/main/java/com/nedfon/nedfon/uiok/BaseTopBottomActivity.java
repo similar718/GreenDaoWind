@@ -34,7 +34,9 @@ public abstract class BaseTopBottomActivity extends AppCompatActivity {
     private LinearLayout ll_personalcenter;
 
     private TextView mBack;
-    private TextView mTitleTv;
+    public TextView mTitleTv;
+
+    private ImageView mRedDotIv;
 
     private ImageView mDataQueryIv,mDeviceSetInternetIv,mDeviceBindIv,mPersonalInfoIv;
 
@@ -56,6 +58,8 @@ public abstract class BaseTopBottomActivity extends AppCompatActivity {
         ll_setinternet = (LinearLayout) findViewById(R.id.ll_setinternet);
         ll_devicebind = (LinearLayout) findViewById(R.id.ll_devicebind);
         ll_personalcenter = (LinearLayout) findViewById(R.id.ll_personalcenter);
+
+        mRedDotIv = findViewById(R.id.personal_red_dot_iv);
 
         mDataQueryIv = this.findViewById(R.id.data_query_iv);
         mDeviceSetInternetIv = this.findViewById(R.id.device_set_internet_iv);
@@ -124,6 +128,17 @@ public abstract class BaseTopBottomActivity extends AppCompatActivity {
         });
 
         viewdefualtStatus();
+
+
+        setShowRedDot();
+    }
+
+    public void setShowRedDot(){
+        if (CommonUtils.mIsShowRedPoint){
+            mRedDotIv.setVisibility(View.VISIBLE);
+        } else {
+            mRedDotIv.setVisibility(View.GONE);
+        }
     }
 
     public void setTitleText(String title){

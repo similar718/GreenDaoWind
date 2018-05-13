@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">全热新风交换机</string>
+    <string name="app_name">绿岛风智联</string><!-- 全热新风交换机--><!-- 绿岛风智能生活-->
 
     <string name="activity_login_forgotpwd_txt">忘记密码</string>
     <string name="activity_login_register_txt"><![CDATA[注 册]]></string>

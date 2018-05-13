@@ -177,9 +177,9 @@ public class ExhaustVentilatorOkActivity extends BaseTopBottomActivity implement
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(1);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(5);
                 } else {
                     mHandler.sendEmptyMessage(2);

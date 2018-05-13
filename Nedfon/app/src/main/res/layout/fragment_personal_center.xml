@@ -159,6 +159,15 @@
             android:layout_marginLeft="20dp"
             />
         <ImageView
+            android:id="@+id/msg_info_red_iv"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/red_dot"
+            android:layout_toRightOf="@+id/msg_txt"
+            android:layout_above="@+id/msg_txt"
+            android:visibility="gone"
+            />
+        <ImageView
             android:id="@+id/fragment_personal_center_msg_right_iv"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"

@@ -241,11 +241,11 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
             public void onResponse(Call call, Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":0,")){
+                if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(SEND_INVALID_FAILED);
                 } else if (res.equals("") || null == res) {
                     mHandler.sendEmptyMessage(SERVER_EXCEPTION);
-                } else if (res.contains(":1,")){
+                } else if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(SEND_INVALID_SUCCESS);
                 } else {
                     mHandler.sendEmptyMessage(OTHER_ERROR);
@@ -300,11 +300,11 @@ public class ForgotPasswordActivity extends AppCompatActivity implements View.On
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":0,")){
+                if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(REGISTER_FAILED);
                 } else if (res.equals("") || null == res) {
                     mHandler.sendEmptyMessage(SERVER_EXCEPTION);
-                } else if (res.contains(":1,")){
+                } else if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(REGISTER_SUCCESS);
                 } else {
                     mHandler.sendEmptyMessage(4);

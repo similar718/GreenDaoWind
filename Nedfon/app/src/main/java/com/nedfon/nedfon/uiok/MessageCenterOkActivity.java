@@ -113,6 +113,8 @@ public class MessageCenterOkActivity extends BaseTopBottomActivity implements Vi
 
     @Override
     protected void setBackOnClick() {
+        Intent personal = new Intent(MessageCenterOkActivity.this,PersonalCenterOkActivity.class);
+        startActivity(personal);
         this.finish();
     }
 
@@ -145,11 +147,11 @@ public class MessageCenterOkActivity extends BaseTopBottomActivity implements Vi
             @Override
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
-                Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                Log.e("oooooooooo", "onResponse:  res11 = "+res );
+                if (res.contains(CommonUtils.mSuccess)){
                     mBean = new Gson().fromJson(res,GetMsgInfoAllBean.class);
                     mHandler.sendEmptyMessage(3);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(1);
                 } else {
                     mHandler.sendEmptyMessage(2);

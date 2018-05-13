@@ -15,6 +15,7 @@ public class GetPersonInfoBean {
     public String nickname;
     public String phone;
     public int sex;
+    public int loginCount;
     public int status;
     public String registerIp;
 }

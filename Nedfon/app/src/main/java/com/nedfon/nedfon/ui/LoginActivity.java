@@ -193,11 +193,12 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             } else {
                 myDBHelper.insert1(bean);
             }
-        startpage(bean.token);
+        startpage(bean.token,bean.phone);
     }
 
-    private void startpage(String token){
+    private void startpage(String token,String phone){
         CommonUtils.token = token;
+        CommonUtils.phone = phone;
         SharedPreferences sp = getSharedPreferences("nedfon",MODE_PRIVATE);
         SharedPreferences.Editor edit = sp.edit();
         edit.putString("token", token);
@@ -265,11 +266,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":0,")){
+                if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(1);
                 } else if (res.equals("") || null == res) {
                     mHandler.sendEmptyMessage(2);
-                } else if (res.contains(":1,")){
+                } else if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(3);
                     LoginSuccess bean = new Gson().fromJson(res,LoginSuccess.class);
                     startActivityToMain(new DbDean(mPhoneEt.getText().toString(),mPwdEt.getText().toString(),bean.token, (System.currentTimeMillis()+(60*60*24*7))),true);
@@ -302,11 +303,11 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":0,")){
+                if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(5);
                 } else if (res.equals("") || null == res) {
                     mHandler.sendEmptyMessage(2);
-                } else if (res.contains(":1,")){
+                } else if (res.contains(CommonUtils.mSuccess)){
                     LoginSuccess bean = new Gson().fromJson(res,LoginSuccess.class);
                     startActivityToMain(new DbDean(list.get(0).phone,list.get(0).pwd,bean.token,list.get(0).time),true);
                     mHandler.sendEmptyMessage(6);

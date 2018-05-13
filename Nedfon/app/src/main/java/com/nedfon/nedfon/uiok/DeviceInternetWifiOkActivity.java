@@ -291,10 +291,10 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
             public void onResponse(Call request, Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                if (res.contains(CommonUtils.mSuccess)){
                     uploadres = res;
                     mHandler.sendEmptyMessage(1);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(5);
                 } else {
                     mHandler.sendEmptyMessage(2);
@@ -307,7 +307,7 @@ public class DeviceInternetWifiOkActivity extends BaseTopBottomActivity implemen
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-                    ToastUtils.show(DeviceInternetWifiOkActivity.this,"上传成功！"+uploadres);
+//                    ToastUtils.show(DeviceInternetWifiOkActivity.this,"上传成功！"+uploadres);
                     setBackOnClick();
                     break;
                 case 2 :

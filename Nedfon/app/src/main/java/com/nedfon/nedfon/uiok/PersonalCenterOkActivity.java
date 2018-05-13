@@ -51,6 +51,8 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
     private RelativeLayout mInfoRl,mMsgRl,mUpdatePwdRl;
     private ImageView mInfoIv,mMsgIv,mUpdatePwdIv;
 
+    private ImageView mRedDot;
+
     private MyDBHelper myDBHelper;
 
 //    private DeviceInfo info;
@@ -91,6 +93,7 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
         mInfoIv = this.findViewById(R.id.fragment_personal_center_info_right_iv);
         mMsgIv = this.findViewById(R.id.fragment_personal_center_msg_right_iv);
         mUpdatePwdIv = this.findViewById(R.id.fragment_personal_center_update_pwd_right_iv);
+        mRedDot = this.findViewById(R.id.msg_info_red_iv);
 
         mExitRl.setOnClickListener(this);
 
@@ -117,7 +120,7 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
     @Override
     public void onClick(View v) {
         switch (v.getId()){
-            case R.id.fragment_personal_center_exit_rl://退出 //TODO 我这边做数据库的操作
+            case R.id.fragment_personal_center_exit_rl://退出
                 if (myDBHelper.query().size()>0){
                     DbDean bean = myDBHelper.query().get(0);
                     myDBHelper.delete(bean.phone);
@@ -127,15 +130,16 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
                 }
 
                 break;
-            case R.id.fragment_personal_center_info_rl://个人信息RL TODO
+            case R.id.fragment_personal_center_info_rl://个人信息RL
                 Intent information = new Intent(PersonalCenterOkActivity.this, MyInformationOkActivity.class);
                 startActivity(information);
                 break;
-            case R.id.fragment_personal_center_msg_rl://消息中心RL TODO
+            case R.id.fragment_personal_center_msg_rl://消息中心RL
                 Intent msgcenter = new Intent(PersonalCenterOkActivity.this, MessageCenterOkActivity.class);
                 startActivity(msgcenter);
+                this.finish();
                 break;
-            case R.id.fragment_personal_center_update_pwd_rl://修改密码RL TODO
+            case R.id.fragment_personal_center_update_pwd_rl://修改密码RL
                 Intent resetpwd = new Intent(PersonalCenterOkActivity.this, ResetPwdActivity.class);
                 startActivity(resetpwd);
                 this.finish();
@@ -147,6 +151,7 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
             case R.id.fragment_personal_center_msg_right_iv://消息中心IV
                 Intent msgcenter1 = new Intent(PersonalCenterOkActivity.this, MessageCenterOkActivity.class);
                 startActivity(msgcenter1);
+                this.finish();
                 break;
             case R.id.fragment_personal_center_update_pwd_right_iv://修改密码IV
                 Intent resetpwd1 = new Intent(PersonalCenterOkActivity.this, ResetPwdActivity.class);
@@ -188,10 +193,10 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains("nickname\":")){
+                if (res.contains(CommonUtils.mSuccess)){
                     mBean = new Gson().fromJson(res,GetPersonInfoAllBean.class);
                     mHandler.sendEmptyMessage(3);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(1);
                 } else {
                     mHandler.sendEmptyMessage(2);
@@ -220,5 +225,19 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
         CommonUtils.info = mBean.data;
         mUserNameTv.setText(mBean.data.nickname);
         mPhoneNumberTv.setText(mBean.data.phone);
+
+        if (mBean.data.loginCount!=0 && !"".equals(mBean.data.loginCount+"")){
+            CommonUtils.mIsShowRedPoint = true;
+            setShowRedDot();
+        } else {
+            CommonUtils.mIsShowRedPoint = false;
+            setShowRedDot();
+        }
+
+        if (CommonUtils.mIsShowRedPoint){
+            mRedDot.setVisibility(View.VISIBLE);
+        } else {
+            mRedDot.setVisibility(View.GONE);
+        }
     }
 }

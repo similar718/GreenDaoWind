@@ -20,11 +20,18 @@ public class CommonUtils {
 //    public static final String localhostwebsocket = "ws://111.231.234.151:9090/endpointWisely/websocket"; // TODO 更换地址39.108.215.34:8080
 
     public static final String localhost = "http://39.108.215.34:8080/"; // TODO 更换地址http://39.108.215.34:8080/  http://39.108.215.34:8080
-    public static final String localhostwebsocket = "ws://139.108.215.34:8080/endpointWisely/websocket"; // TODO 更换地址39.108.215.34:8080
+    public static final String localhostwebsocket = "ws://39.108.215.34:8080/endpointWisely/websocket"; // TODO 更换地址39.108.215.34:8080
 
 //    public static final String localhost = "http://111.231.234.151:8234/";
 
+    public static boolean mIsShowRedPoint = false;
+    public static boolean mIsFlagShowRedPoint = true;
+
+    public static String mFailed = "result\":0,";
+    public static String mSuccess = "result\":1,";
+
     public static String token = "";
+    public static String phone = "";
     public static String deviceSN = "";
     public static String[] mDeviceList = null;
     public static DeviceInfo bean = null;

@@ -21,6 +21,7 @@ import com.nedfon.nedfon.adapter.DeviceBindAdapter;
 import com.nedfon.nedfon.bean.DeviceBindBean_test;
 import com.nedfon.nedfon.bean.DeviceListAll;
 import com.nedfon.nedfon.bean.GetCurrentWeatherAll;
+import com.nedfon.nedfon.bean.GetPersonInfoAllBean;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.NetWorkUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
@@ -103,7 +104,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
         String[] list = new String[mlistbean.data.size()];
         for (int i=0;i<mlistbean.data.size();i++){
             DeviceBindBean_test bean = new DeviceBindBean_test();
-            bean.name = mlistbean.data.get(i).deviceid;
+            bean.name = mlistbean.data.get(i).deviceid+"  "+mlistbean.data.get(i).terminal;
             bean.online = mlistbean.data.get(i).commStatus==0?"离线":"在线";
             bean.wendu = mlistbean.data.get(i).intmp+"°";
             bean.shidu = mlistbean.data.get(i).insweet+"%";
@@ -170,6 +171,11 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                 }
             }
         });
+
+        if (CommonUtils.mIsFlagShowRedPoint) {
+            doGetPersonInfoGet(CommonUtils.token);
+            CommonUtils.mIsFlagShowRedPoint = false;
+        }
     }
 
     private void isWIFIOrOther(){
@@ -181,7 +187,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             this.finish();
             return;
         } else if(type == 0) {
-            ToastUtils.show(DeviceBindOkActivity.this, "当前网络不可用");//TODO 使用该软件需要连接网络
+            ToastUtils.show(DeviceBindOkActivity.this, "当前网络不可用");
             AlertDialog.Builder builder = new AlertDialog.Builder(DeviceBindOkActivity.this);
             builder.setTitle("提示").setMessage("您已经进入到了没有网络的异次元，请打开您的网络或者连接WiFi。");
             builder.setPositiveButton("确定", new DialogInterface.OnClickListener() {
@@ -233,10 +239,10 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                if (res.contains(CommonUtils.mSuccess)){
                     mlistbean = new Gson().fromJson(res,DeviceListAll.class);
                     mHandler.sendEmptyMessage(4);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(5);
                 } else {
                     mHandler.sendEmptyMessage(2);
@@ -290,10 +296,10 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                if (res.contains(CommonUtils.mSuccess)){
                     bean = new Gson().fromJson(res,GetCurrentWeatherAll.class);
                     mHandler.sendEmptyMessage(3);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(1);
                 } else {
                     mHandler.sendEmptyMessage(2);
@@ -323,9 +329,52 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                 case 6 :
                     doDeviceListGet(CommonUtils.token);
                     break;
+
+                case 13 : //TODO
+                    if (mBean.data.loginCount!=0&&!"".equals(mBean.data.loginCount+"")) {
+                        CommonUtils.mIsShowRedPoint = true;
+                        setShowRedDot();
+                    }
+                    break;
             }
         }
     };
+
+    private  void doGetPersonInfoGet(String token){
+        //1.拿到OkHttpClient对象
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
+        //2.构造Request
+        Request.Builder builder = new Request.Builder();
+        // http://localhost:9090/mobileapi/getPersonInfo?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE1MTk5NTg5MjksInVzZXJuYW1lIjoi
+        // MTM1MTI3NzQ3NjAifQ.DP22dBsyMqnPoQyMw0KV51WN_OImBxI8rfphBS-eWfs
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/getPersonInfo?token="+token).get().build();
+        executeGetPersonInfoRequest(request);
+    }
+
+    private GetPersonInfoAllBean mBean = null;
+
+    private void executeGetPersonInfoRequest(Request request) {
+        //3.将Request封装为Call
+        Call call = okhttpclient.newCall(request);
+        //异步使用CallBack  同步用call.execute()
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call request, IOException e) {
+                e.printStackTrace();
+            }
+            @Override
+            public void onResponse(Call request,Response response) throws IOException {
+                final String res = response.body().string();
+                Log.e("ooooooooooooooo",res);
+                if (res.contains(CommonUtils.mSuccess)){
+                    mBean = new Gson().fromJson(res,GetPersonInfoAllBean.class);
+                    mHandler.sendEmptyMessage(13);
+                } else if (res.contains(CommonUtils.mFailed)){
+                } else {
+                }
+            }
+        });
+    }
 
     private void updateListView() {
         initData();

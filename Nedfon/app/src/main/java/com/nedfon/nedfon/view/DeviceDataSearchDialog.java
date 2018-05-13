@@ -36,6 +36,12 @@ public class DeviceDataSearchDialog extends Dialog {
         setContentView(view);
     }
     public void ShowDialog(String[] list, AdapterView.OnItemClickListener onItemClickListener){
+        if (list == null){ //23881531  25594463  13512774760
+            list = new String[]{"没有设备可查询，请使用【设备配网】来添加设备"};
+//            list[0] = "没有设备可查询，请使用【设备配网】来添加设备";
+        } else {
+            mDeviceListLv.setOnItemClickListener(onItemClickListener);
+        }
 
         mAdapter = new DataSearchDialogAdapter(mContext,list);
         mDeviceListLv.setAdapter(mAdapter);
@@ -46,7 +52,6 @@ public class DeviceDataSearchDialog extends Dialog {
                 dismiss();
             }
         });
-        mDeviceListLv.setOnItemClickListener(onItemClickListener);
         show();
     }
 }

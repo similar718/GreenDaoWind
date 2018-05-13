@@ -33,6 +33,8 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
     private LinearLayout ll_devicebind;
     private LinearLayout ll_personalcenter;
 
+    private ImageView mRedDotIv;
+
     private ImageView mDataQueryIv,mDeviceSetInternetIv,mDeviceBindIv,mPersonalInfoIv;
 
     public static String NAME = "";
@@ -53,6 +55,7 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
         ll_setinternet = (LinearLayout) findViewById(R.id.ll_setinternet);
         ll_devicebind = (LinearLayout) findViewById(R.id.ll_devicebind);
         ll_personalcenter = (LinearLayout) findViewById(R.id.ll_personalcenter);
+        mRedDotIv = findViewById(R.id.personal_red_dot_iv);
 
         mDataQueryIv = this.findViewById(R.id.data_query_iv);
         mDeviceSetInternetIv = this.findViewById(R.id.device_set_internet_iv);
@@ -111,6 +114,16 @@ public abstract class BaseBottomActivity extends AppCompatActivity {
         });
 
         viewdefualtStatus();
+
+        setShowRedDot();
+    }
+
+    public void setShowRedDot(){
+        if (CommonUtils.mIsShowRedPoint){
+            mRedDotIv.setVisibility(View.VISIBLE);
+        } else {
+            mRedDotIv.setVisibility(View.GONE);
+        }
     }
 
     public void setImage(int id){

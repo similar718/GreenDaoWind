@@ -473,7 +473,7 @@
                         android:id="@+id/paiqi_iv"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:src="@drawable/exhaust_icon"
+                        android:src="@drawable/exhaust_icon_gray"
                         />
                     <TextView
                         android:id="@+id/paiqi_tv"
@@ -483,7 +483,7 @@
                         android:text="排气"
                         android:layout_marginLeft="7dp"
                         android:textSize="12sp"
-                        android:textColor="@color/activity_device_center_txt_color"
+                        android:textColor="@color/text_gray"
                         />
 
                     <ImageView

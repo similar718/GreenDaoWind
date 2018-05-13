@@ -1,11 +1,14 @@
 package com.nedfon.nedfon.uiok;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.Display;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -17,6 +20,7 @@ import com.nedfon.nedfon.bean.DeviceInfo;
 import com.nedfon.nedfon.bean.DeviceInfoAll;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
+import com.nedfon.nedfon.view.DeviceReSetNameDialog;
 import com.nedfon.nedfon.view.SwitchButton;
 
 import org.java_websocket.WebSocket;
@@ -24,6 +28,8 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.IOException;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -84,10 +90,12 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
         super.onCreate(savedInstanceState);
         NAME = DeviceOkActivity.class.getSimpleName();
         setImage(3);
-        setTitleText("设 备");
+//        setTitleText("设 备");
 
         initView();
+        info = CommonUtils.bean;
         DeviceSN = CommonUtils.bean.deviceid;
+        setTitleText(CommonUtils.bean.terminal);
 //        mThread = new GetDeviceInfoThread();
 //        mThread.start();
 
@@ -125,13 +133,13 @@ private boolean isInit = true;
 
     // 接收/user/xiaoli/message路径发布的消息
     private void registerStompTopic() {
-        mStompClient.topic("/user/"+info.userphone+"/msg")
+        mStompClient.topic("/user/"+CommonUtils.phone+"/msg")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(topicMessage -> {
                     Log.e("oooooooooo", "Received " + topicMessage.getPayload());
                     String res = topicMessage.getPayload();
-                    if (res.contains(":1,")){
+                    if (res.contains(CommonUtils.mSuccess)){
                         DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
                         if (info == null){
                             return;
@@ -156,7 +164,7 @@ private boolean isInit = true;
 
     private void sendMessage(){
         // 向/app/cheat发送Json数据
-        mStompClient.send("/ws-push/welcome","{'name':'"+info.userphone+"'}").subscribe(new Subscriber<Void>() {
+        mStompClient.send("/ws-push/welcome","{'name':'"+CommonUtils.phone+"'}").subscribe(new Subscriber<Void>() {
                     @Override
                     public void onError(Throwable e) {
                         e.printStackTrace();
@@ -310,6 +318,14 @@ private boolean isInit = true;
         mPaiqiHaunqiRl.setOnClickListener(this);
         mFengjiPowerRl.setOnClickListener(this);
 
+        mReNameDialog = new DeviceReSetNameDialog(DeviceOkActivity.this);
+
+        WindowManager windowManager = getWindowManager();
+        Display display = windowManager.getDefaultDisplay();
+        WindowManager.LayoutParams lp = mReNameDialog.getWindow().getAttributes();
+        lp.width = (int)(display.getWidth() * 0.8); //设置宽度
+        mReNameDialog.getWindow().setAttributes(lp);
+
         mPowerSb.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
@@ -359,9 +375,38 @@ private boolean isInit = true;
                         isdi+"",power+"",fulizi1+"","1",power+"");
             }
         });
+        //顶部点击出现解绑和绑定
+        mTitleTv.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                mReNameDialog.ShowD(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        // TODO 解绑设备 test
+                        doBindingDeviceGet(CommonUtils.token,info.deviceid);
+                    }
+                });
+            }
+        });
+
+        mReNameDialog.setOnItemGetEtListener(new DeviceReSetNameDialog.GetEt() {
+            @Override
+            public void OptionEt(String txt) {
+                if ("".equals(txt) || txt == null){
+                    ToastUtils.show(DeviceOkActivity.this,"请输入设备名称");
+                } else {
+                    //TODO 修改名称 test
+                    doModifyDeviceNameGet(CommonUtils.token,info.deviceid,txt,info.userphone);
+                }
+            }
+        });
 
         initData();
     }
+
+    private String deviceName = "";
+
+    private DeviceReSetNameDialog mReNameDialog;
 
     private void initData() {
         Log.e("oooooooooo", "onCreateView: token = "+ getSharedPreferences("nedfon",MODE_PRIVATE).getString("token", ""));
@@ -372,6 +417,7 @@ private boolean isInit = true;
             return;
         }
         info = CommonUtils.bean;
+        setTitleText(info.terminal);
         if (info.status!=0){
             ToastUtils.show(DeviceOkActivity.this,"设备异常");
         }
@@ -380,14 +426,61 @@ private boolean isInit = true;
         mHumidityTv.setText(info.outsweet+"%");
         mPm25Tv.setText(info.outpm25+"");
 
+        // A #437A14         C：  #B4D31F         F：  #F4B855        G：   #C6100B
         if ((info.inpm25/2)<=25){
             mWuRanTxtTv.setText("干净");
+            mWuRanTxtTv.setTextColor(Color.parseColor("#437A14"));
+            mPm25BigTv.setTextColor(Color.parseColor("#437A14"));
         } else if ((info.inpm25/2)<=75 && (info.inpm25/2)>25){
             mWuRanTxtTv.setText("轻度污染");
+            mWuRanTxtTv.setTextColor(Color.parseColor("#B4D31F"));
+            mPm25BigTv.setTextColor(Color.parseColor("#B4D31F"));
         } else if ((info.inpm25/2)<=100 && (info.inpm25/2)>75){
             mWuRanTxtTv.setText("中度污染");
+            mWuRanTxtTv.setTextColor(Color.parseColor("#F4B855"));
+            mPm25BigTv.setTextColor(Color.parseColor("#F4B855"));
         } else if ((info.inpm25/2)>100){
             mWuRanTxtTv.setText("重度污染");
+            mWuRanTxtTv.setTextColor(Color.parseColor("#C6100B"));
+            mPm25BigTv.setTextColor(Color.parseColor("#C6100B"));
+        }
+
+
+        if (info.intmpalarmdata!=0 && !"".equals(info.intmpalarmdata+"") && info.intmp>info.intmpalarmdata){
+//            mBigTemperatureTv.setTextColor(Color.parseColor("#ff0000"));
+            if (timerTempera!=null) return;
+            timerTempera = new Timer();
+            sparkTemperature();
+        } else {
+            if (timerTempera !=null){
+                timerTempera.cancel();
+                timerTempera = null;
+            }
+            mBigTemperatureTv.setTextColor(Color.parseColor("#24D4B7"));
+        }
+        if (info.inpm25alarmdata>0 && !"".equals(info.inpm25alarmdata+"") && info.inpm25>info.inpm25alarmdata){
+//            mPm25BigTv.setTextColor(Color.parseColor("#ff0000"));
+            if(timerPM25 != null) return;
+            timerPM25 = new Timer();
+            sparkPM25();
+        } else {
+            if (timerPM25 !=null){
+                timerPM25.cancel();
+                timerPM25 = null;
+            }
+//            mPm25BigTv.setTextColor(Color.parseColor("#24D4B7"));
+        }
+        if (info.sweetalarmdata>0 && !"".equals(info.sweetalarmdata+"") && info.insweet>info.sweetalarmdata){
+            if (timerHumility !=null) return;
+            timerHumility = new Timer();
+            sparkHumility();
+//            mShiduBigTv.setTextColor(Color.parseColor("#ff0000"));
+        } else {
+            if (timerHumility !=null){
+                timerHumility.cancel();
+                timerHumility = null;
+            }
+            mShiduBigTv.setTextColor(Color.parseColor("#24D4B7"));
         }
         mBigTemperatureTv.setText(((int)info.intmp)+"°");
         mShiduBigTv.setText(((int)info.insweet)+"%");
@@ -403,37 +496,20 @@ private boolean isInit = true;
         //排气换气自动 手动
 //        boolean paiqihuanqiisopen = auto==2?true:false; //2自动 1手动
         if (auto == 2){
-//            mPaiqiHuanqiSb.setEnabled(true);
-//            SwitchButton.flag = true;
-//            mPaiqiHuanqiSb.setChecked(true);
-//            mPaiqiHuanqiSb.setEnabled(false);
             mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
             mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
             mPaiqiHuanqiBg.setImageResource(R.drawable.on_off_btn_bg);
         } else {
-//            mPaiqiHuanqiSb.setEnabled(true);
-//            SwitchButton.flag = true;
-//            mPaiqiHuanqiSb.setChecked(false);
-//            mPaiqiHuanqiSb.setEnabled(false);
             mPaiqiHaunqiAuto.setVisibility(View.GONE);
             mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
             mPaiqiHuanqiBg.setImageResource(R.drawable.kai1_icon);
         }
         //负离子开关
-//        boolean fuliziisopen = info.ionsflag==1?true:false;
         if (fulizi == 1){
-//            mFuliziSb.setEnabled(true);
-//            SwitchButton.flag = true;
-//            mFuliziSb.setChecked(true);
-//            mFuliziSb.setEnabled(false);
             mFuliziKai.setVisibility(View.VISIBLE);
             mFuliziGuan.setVisibility(View.GONE);
             mFuliziBg.setImageResource(R.drawable.kai1_icon);
         } else {
-//            mFuliziSb.setEnabled(true);
-//            SwitchButton.flag = true;
-//            mFuliziSb.setChecked(false);
-//            mFuliziSb.setEnabled(false);
             mFuliziKai.setVisibility(View.GONE);
             mFuliziGuan.setVisibility(View.VISIBLE);
             mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
@@ -441,18 +517,10 @@ private boolean isInit = true;
         //电源开关
         boolean poweropen = power ==0?false:true;
         if (poweropen){
-//            mPowerSb.setEnabled(true);
-//            SwitchButton.flag = true;
-//            mPowerSb.setChecked(true);
-//            mPowerSb.setEnabled(false);
             mFengjiPowerKai.setVisibility(View.VISIBLE);
             mFengjiPowerGuan.setVisibility(View.GONE);
             mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
         } else {
-//            mPowerSb.setEnabled(true);
-//            SwitchButton.flag = true;
-//            mPowerSb.setChecked(false);
-//            mPowerSb.setEnabled(false);
             mFengjiPowerKai.setVisibility(View.GONE);
             mFengjiPowerGuan.setVisibility(View.VISIBLE);
             mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
@@ -476,6 +544,91 @@ private boolean isInit = true;
     private boolean mIsAuto = false;
     private boolean mIsHuanqi = false;
 
+
+    private int Temperatureclo = 0;
+    Timer timerTempera = new Timer();
+    public void sparkTemperature() {
+        TimerTask taskcc = new TimerTask(){
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (Temperatureclo == 0) {
+                            Temperatureclo = 1;
+                            mBigTemperatureTv.setTextColor(Color.TRANSPARENT); // 透明
+                        } else {
+                            if (Temperatureclo == 1) {
+                                Temperatureclo = 2;
+                                mBigTemperatureTv.setTextColor(Color.RED);
+                            } else {
+                                Temperatureclo = 0;
+                                mBigTemperatureTv.setTextColor(Color.GREEN);
+                            }
+                        }
+                    }
+                });
+            }
+        };
+        if (timerTempera!=null)
+            timerTempera.schedule(taskcc, 1, 300);
+        // 参数分别是delay（多长时间后执行），duration（执行间隔）
+    }
+
+    private int mPM25clo = 0;
+    Timer timerPM25 = new Timer();
+    public void sparkPM25() {
+        TimerTask taskcc = new TimerTask(){
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (mPM25clo == 0) {
+                            mPM25clo = 1;
+                            mPm25BigTv.setTextColor(Color.TRANSPARENT); // 透明
+                        } else {
+                            if (mPM25clo == 1) {
+                                mPM25clo = 2;
+                                mPm25BigTv.setTextColor(Color.RED);
+                            } else {
+                                mPM25clo = 0;
+                                mPm25BigTv.setTextColor(Color.GREEN);
+                            }
+                        }
+                    }
+                });
+            }
+        };
+        if (timerPM25 !=null)
+            timerPM25.schedule(taskcc, 1, 300);
+        // 参数分别是delay（多长时间后执行），duration（执行间隔）
+    }
+
+    private int Himulityclo = 0;
+    Timer timerHumility = new Timer();
+    public void sparkHumility() {
+        TimerTask taskcc = new TimerTask(){
+            public void run() {
+                runOnUiThread(new Runnable() {
+                    public void run() {
+                        if (Himulityclo == 0) {
+                            Himulityclo = 1;
+                            mShiduBigTv.setTextColor(Color.TRANSPARENT); // 透明
+                        } else {
+                            if (Himulityclo == 1) {
+                                Himulityclo = 2;
+                                mShiduBigTv.setTextColor(Color.RED);
+                            } else {
+                                Himulityclo = 0;
+                                mShiduBigTv.setTextColor(Color.GREEN);
+                            }
+                        }
+                    }
+                });
+            }
+        };
+        if (timerHumility != null)
+            timerHumility.schedule(taskcc, 1, 300);
+        // 参数分别是delay（多长时间后执行），duration（执行间隔）
+    }
+    
     @Override
     public void onClick(View v) {
         switch (v.getId()){
@@ -630,14 +783,14 @@ private boolean isInit = true;
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                if (res.contains(CommonUtils.mSuccess)){
                     DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
                     if (CommonUtils.bean != info.data && info.data.deviceid.equals(DeviceSN)) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
                         CommonUtils.bean = null;
                         CommonUtils.bean = info.data;
                         mHandler.sendEmptyMessage(3);
                     }
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(5);
                 } else {
                     mHandler.sendEmptyMessage(2);
@@ -693,9 +846,9 @@ private boolean isInit = true;
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
-                if (res.contains(":1,")){
+                if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(1);
-                } else if (res.contains(":0,")){
+                } else if (res.contains(CommonUtils.mFailed)){
                     mHandler.sendEmptyMessage(5);
                 } else {
                     mHandler.sendEmptyMessage(2);
@@ -703,6 +856,86 @@ private boolean isInit = true;
             }
         });
     }
+
+    /**
+     * 修改设备名称
+     * @param token
+     * @param deviceSN
+     * @param teminal
+     */
+    private void doModifyDeviceNameGet(String token,String deviceSN,String teminal,String phone){
+        //1.拿到OkHttpClient对象
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
+        //2.构造Request
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/modifyDeviceName?token="+token+"&deviceSN="+deviceSN+"&terminal="+teminal/*+"&userPHONE="+phone*/).get().build();
+        executeModifyDeviceNameRequest(request,teminal);
+    }
+
+    private void executeModifyDeviceNameRequest(Request request,String teminal) {
+        //3.将Request封装为Call
+        Call call = okhttpclient.newCall(request);
+        //异步使用CallBack  同步用call.execute()
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call request, IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            @Override
+            public void onResponse(Call request,Response response) throws IOException {
+                final String res = response.body().string();
+                Log.e("oooooooooo", "onResponse: modifyDeviceName res = "+res );
+                if (res.contains(CommonUtils.mSuccess)){
+                    deviceName = teminal;
+                    mHandler.sendEmptyMessage(6);
+                } else if (res.contains(CommonUtils.mFailed)){
+                    mHandler.sendEmptyMessage(5);
+                } else {
+                    mHandler.sendEmptyMessage(2);
+                }
+            }
+        });
+    }
+
+    /**
+     * 解绑设备
+     * @param token
+     * @param deviceSN
+     */
+    private void doBindingDeviceGet(String token,String deviceSN){
+        //1.拿到OkHttpClient对象
+        FormBody.Builder requestBodyBuilder = new FormBody.Builder();
+        //2.构造Request]
+        Request.Builder builder = new Request.Builder();
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/bindingDevice?token="+token+"&deviceSN="+deviceSN).get().build();
+        executeBindingDeviceRequest(request);
+    }
+    private void executeBindingDeviceRequest(Request request) {
+        //3.将Request封装为Call
+        Call call = okhttpclient.newCall(request);
+        //异步使用CallBack  同步用call.execute()
+        call.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call request, IOException e) {
+                e.printStackTrace();
+                return;
+            }
+            @Override
+            public void onResponse(Call request,Response response) throws IOException {
+                final String res = response.body().string();
+                Log.e("oooooooooo", "onResponse:  res = "+res );
+                if (res.contains(CommonUtils.mSuccess)){
+                    mHandler.sendEmptyMessage(7);
+                } else if (res.contains(CommonUtils.mFailed)){
+                    mHandler.sendEmptyMessage(5);
+                } else {
+                    mHandler.sendEmptyMessage(2);
+                }
+            }
+        });
+    }
+
     public Handler mHandler = new Handler(){
         @Override
         public void handleMessage(Message msg) {
@@ -711,31 +944,23 @@ private boolean isInit = true;
                     ToastUtils.show(DeviceOkActivity.this,"设置成功！");
                     if (mIsAuto){
                         if (auto != 2){
-//                            SwitchButton.flag = true;
-//                            mPaiqiHuanqiSb.setChecked(false);
                             mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
                             mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
                             mPaiqiHuanqiBg.setImageResource(R.drawable.on_off_btn_bg);
                             auto = 2;
                         } else {
                             auto = 1;
-//                            SwitchButton.flag = true;
-//                            mPaiqiHuanqiSb.setChecked(true);
                             mPaiqiHaunqiAuto.setVisibility(View.GONE);
                             mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
                             mPaiqiHuanqiBg.setImageResource(R.drawable.kai1_icon);
                         }
                     } else if(mIsIonsFlag){
                         if (fulizi != 1){
-//                            SwitchButton.flag = true;
-//                            mFuliziSb.setChecked(true);
                             mFuliziKai.setVisibility(View.VISIBLE);
                             mFuliziGuan.setVisibility(View.GONE);
                             mFuliziBg.setImageResource(R.drawable.kai1_icon);
                             fulizi = 1;
                         } else {
-//                            SwitchButton.flag = true;
-//                            mFuliziSb.setChecked(false);
                             mFuliziKai.setVisibility(View.GONE);
                             mFuliziGuan.setVisibility(View.VISIBLE);
                             mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
@@ -743,15 +968,11 @@ private boolean isInit = true;
                         }
                     } else if(mIsPower){
                         if (power != 1){
-//                            SwitchButton.flag = true;
-//                            mPowerSb.setChecked(true);
                             mFengjiPowerKai.setVisibility(View.VISIBLE);
                             mFengjiPowerGuan.setVisibility(View.GONE);
                             mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
                             power = 1;
                         } else {
-//                            SwitchButton.flag = true;
-//                            mPowerSb.setChecked(false);
                             mFengjiPowerKai.setVisibility(View.GONE);
                             mFengjiPowerGuan.setVisibility(View.VISIBLE);
                             mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
@@ -774,32 +995,23 @@ private boolean isInit = true;
                     break;
                 case 2 :
                     ToastUtils.show(DeviceOkActivity.this,"其他错误");
-//                    if (mIsAuto){
-//                        SwitchButton.flag = true;
-//                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
-//                    } else if(mIsIonsFlag){
-//                        SwitchButton.flag = true;
-//                        mFuliziSb.setChecked(fulizi==1?true:false);
-//                    } else if(mIsPower){
-//                        SwitchButton.flag = true;
-//                        mPowerSb.setChecked(power == 1?true:false);
-//                    }
                     break;
                 case 3 :
                     initData();
                     break;
                 case 5 :
                     ToastUtils.show(DeviceOkActivity.this,"设置失败,可能设备离线！");
-//                    if (mIsAuto){
-//                        SwitchButton.flag = true;
-//                        mPaiqiHuanqiSb.setChecked(auto==2?true:false);
-//                    } else if(mIsIonsFlag){
-//                        SwitchButton.flag = true;
-//                        mFuliziSb.setChecked(fulizi==1?true:false);
-//                    } else if(mIsPower){
-//                        SwitchButton.flag = true;
-//                        mPowerSb.setChecked(power == 1?true:false);
-//                    }
+                    break;
+                case 6 :
+                    setTitleText(deviceName);
+                    ToastUtils.show(DeviceOkActivity.this,"提交成功",3000);
+                    if (mReNameDialog.isShowing())
+                        mReNameDialog.dismiss();
+                    break;
+                case 7 :
+                    ToastUtils.show(DeviceOkActivity.this,"解绑设备成功",3000);
+                    if (mReNameDialog.isShowing())
+                        mReNameDialog.dismiss();
                     break;
 
                 case 10:
