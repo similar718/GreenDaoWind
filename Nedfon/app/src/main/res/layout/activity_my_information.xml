@@ -130,6 +130,7 @@
             ></RelativeLayout>
     </RelativeLayout>
     <RelativeLayout
+        android:id="@+id/activity_my_information_address_rl"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.8">
@@ -170,6 +171,7 @@
             ></RelativeLayout>
     </RelativeLayout>
     <RelativeLayout
+        android:id="@+id/activity_my_information_sex_rl"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="0.8">

@@ -12,6 +12,7 @@ import android.view.WindowManager;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.RelativeLayout;
 import android.widget.TextView;
 
 import com.google.gson.Gson;
@@ -45,6 +46,8 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
     private EditText mNameEt;
     private TextView mAddressTv,mSexTv;
     private ImageView mAddressIv,mSexIv;
+
+    private RelativeLayout mAddressRl,mSexRl;
 
     private GetPersonInfoBean bean = CommonUtils.info;
 
@@ -80,10 +83,16 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
         mAddressIv = this.findViewById(R.id.activity_my_information_address_right_iv);
         mSexIv = this.findViewById(R.id.activity_my_information_sex_right_iv);
 
+        mAddressRl = this.findViewById(R.id.activity_my_information_address_rl);
+        mSexRl = this.findViewById(R.id.activity_my_information_sex_rl);
+
         mBackTv.setOnClickListener(this);
         mFinishTv.setOnClickListener(this);
         mAddressIv.setOnClickListener(this);
         mSexIv.setOnClickListener(this);
+
+        mAddressRl.setOnClickListener(this);
+        mSexRl.setOnClickListener(this);
 
         initData();
     }
@@ -116,7 +125,14 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
                 startActivityForResult(new Intent(MyInformationOkActivity.this, CityPickerActivity.class),
                         REQUEST_CODE_PICK_CITY);
                 break;
+            case R.id.activity_my_information_address_rl://地址选择
+                startActivityForResult(new Intent(MyInformationOkActivity.this, CityPickerActivity.class),
+                        REQUEST_CODE_PICK_CITY);
+                break;
             case R.id.activity_my_information_sex_right_iv://性别选择
+                showPopFormBottom();
+                break;
+            case R.id.activity_my_information_sex_rl://性别选择
                 showPopFormBottom();
                 break;
             default:
