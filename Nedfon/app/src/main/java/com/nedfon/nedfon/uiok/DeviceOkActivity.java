@@ -326,6 +326,12 @@ private boolean isInit = true;
         lp.width = (int)(display.getWidth() * 0.8); //设置宽度
         mReNameDialog.getWindow().setAttributes(lp);
 
+        initClickListener();
+
+        initData();
+    }
+
+    private void initClickListener() {
         mPowerSb.setOnCheckedChangeListener(new SwitchButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(SwitchButton view, boolean isChecked) {
@@ -382,7 +388,6 @@ private boolean isInit = true;
                 mReNameDialog.ShowD(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        // TODO 解绑设备 test
                         doBindingDeviceGet(CommonUtils.token,info.deviceid);
                     }
                 });
@@ -395,14 +400,12 @@ private boolean isInit = true;
                 if ("".equals(txt) || txt == null){
                     ToastUtils.show(DeviceOkActivity.this,"请输入设备名称");
                 } else {
-                    //TODO 修改名称 test
                     doModifyDeviceNameGet(CommonUtils.token,info.deviceid,txt,info.userphone);
                 }
             }
         });
-
-        initData();
     }
+
 
     private String deviceName = "";
 
@@ -446,42 +449,12 @@ private boolean isInit = true;
         }
 
 
-        if (info.intmpalarmdata!=0 && !"".equals(info.intmpalarmdata+"") && info.intmp>info.intmpalarmdata){
-//            mBigTemperatureTv.setTextColor(Color.parseColor("#ff0000"));
-            if (timerTempera!=null) return;
-            timerTempera = new Timer();
-            sparkTemperature();
-        } else {
-            if (timerTempera !=null){
-                timerTempera.cancel();
-                timerTempera = null;
-            }
-            mBigTemperatureTv.setTextColor(Color.parseColor("#24D4B7"));
-        }
-        if (info.inpm25alarmdata>0 && !"".equals(info.inpm25alarmdata+"") && info.inpm25>info.inpm25alarmdata){
-//            mPm25BigTv.setTextColor(Color.parseColor("#ff0000"));
-            if(timerPM25 != null) return;
-            timerPM25 = new Timer();
-            sparkPM25();
-        } else {
-            if (timerPM25 !=null){
-                timerPM25.cancel();
-                timerPM25 = null;
-            }
-//            mPm25BigTv.setTextColor(Color.parseColor("#24D4B7"));
-        }
-        if (info.sweetalarmdata>0 && !"".equals(info.sweetalarmdata+"") && info.insweet>info.sweetalarmdata){
-            if (timerHumility !=null) return;
-            timerHumility = new Timer();
-            sparkHumility();
-//            mShiduBigTv.setTextColor(Color.parseColor("#ff0000"));
-        } else {
-            if (timerHumility !=null){
-                timerHumility.cancel();
-                timerHumility = null;
-            }
-            mShiduBigTv.setTextColor(Color.parseColor("#24D4B7"));
-        }
+        setTeamperaTextShowStyle();
+
+        setPm25TextShowStyle();
+
+        setHumilityTextShowStyle();
+
         mBigTemperatureTv.setText(((int)info.intmp)+"°");
         mShiduBigTv.setText(((int)info.insweet)+"%");
         mPm25BigTv.setText(((int)info.inpm25)+"");
@@ -539,6 +512,52 @@ private boolean isInit = true;
         }
     }
 
+    private void setTeamperaTextShowStyle() {
+        if (info.intmpalarmdata!=0 && !"".equals(info.intmpalarmdata+"") && info.intmp>info.intmpalarmdata){
+//            mBigTemperatureTv.setTextColor(Color.parseColor("#ff0000"));
+            if (timerTempera!=null && mTemperatureclo) return;
+            timerTempera = new Timer();
+            sparkTemperature();
+        } else {
+            if (timerTempera !=null){
+                timerTempera.cancel();
+                timerTempera = null;
+            }
+            mTemperatureclo = false;
+            mBigTemperatureTv.setTextColor(Color.parseColor("#24D4B7"));
+        }
+    }
+    private void setPm25TextShowStyle() {
+        if (info.inpm25alarmdata>0 && !"".equals(info.inpm25alarmdata+"") && info.inpm25>info.inpm25alarmdata){
+//            mPm25BigTv.setTextColor(Color.parseColor("#ff0000"));
+            if(timerPM25 != null && mMP25clo) return;
+            timerPM25 = new Timer();
+            sparkPM25();
+        } else {
+            if (timerPM25 !=null){
+                timerPM25.cancel();
+                timerPM25 = null;
+            }
+            mMP25clo = false;
+//            mPm25BigTv.setTextColor(Color.parseColor("#24D4B7"));
+        }
+    }
+    private void setHumilityTextShowStyle() {
+        if (info.sweetalarmdata>0 && !"".equals(info.sweetalarmdata+"") && info.insweet>info.sweetalarmdata){
+            if (timerHumility !=null && mHumidityclo) return;
+            timerHumility = new Timer();
+            sparkHumility();
+//            mShiduBigTv.setTextColor(Color.parseColor("#ff0000"));
+        } else {
+            if (timerHumility !=null){
+                timerHumility.cancel();
+                timerHumility = null;
+            }
+            mHumidityclo = false;
+            mShiduBigTv.setTextColor(Color.parseColor("#24D4B7"));
+        }
+    }
+
     private boolean mIsPower = false;
     private boolean mIsIonsFlag = false;
     private boolean mIsAuto = false;
@@ -546,12 +565,14 @@ private boolean isInit = true;
 
 
     private int Temperatureclo = 0;
+    private boolean mTemperatureclo = false;
     Timer timerTempera = new Timer();
     public void sparkTemperature() {
         TimerTask taskcc = new TimerTask(){
             public void run() {
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        mTemperatureclo = true;
                         if (Temperatureclo == 0) {
                             Temperatureclo = 1;
                             mBigTemperatureTv.setTextColor(Color.TRANSPARENT); // 透明
@@ -574,12 +595,14 @@ private boolean isInit = true;
     }
 
     private int mPM25clo = 0;
+    private boolean mMP25clo = false;
     Timer timerPM25 = new Timer();
     public void sparkPM25() {
         TimerTask taskcc = new TimerTask(){
             public void run() {
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        mMP25clo = true;
                         if (mPM25clo == 0) {
                             mPM25clo = 1;
                             mPm25BigTv.setTextColor(Color.TRANSPARENT); // 透明
@@ -602,12 +625,14 @@ private boolean isInit = true;
     }
 
     private int Himulityclo = 0;
+    private boolean mHumidityclo = false;
     Timer timerHumility = new Timer();
     public void sparkHumility() {
         TimerTask taskcc = new TimerTask(){
             public void run() {
                 runOnUiThread(new Runnable() {
                     public void run() {
+                        mHumidityclo = true;
                         if (Himulityclo == 0) {
                             Himulityclo = 1;
                             mShiduBigTv.setTextColor(Color.TRANSPARENT); // 透明
