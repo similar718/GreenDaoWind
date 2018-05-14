@@ -430,19 +430,19 @@ private boolean isInit = true;
         mPm25Tv.setText(info.outpm25+"");
 
         // A #437A14         C：  #B4D31F         F：  #F4B855        G：   #C6100B
-        if ((info.inpm25/2)<=25){
+        if ((info.inpm25alarmdata*25/100)>=info.inpm25){
             mWuRanTxtTv.setText("干净");
             mWuRanTxtTv.setTextColor(Color.parseColor("#437A14"));
             mPm25BigTv.setTextColor(Color.parseColor("#437A14"));
-        } else if ((info.inpm25/2)<=75 && (info.inpm25/2)>25){
+        } else if ((info.inpm25alarmdata*75/100)>=info.inpm25 && (info.inpm25alarmdata*25/100)<=info.inpm25){
             mWuRanTxtTv.setText("轻度污染");
             mWuRanTxtTv.setTextColor(Color.parseColor("#B4D31F"));
             mPm25BigTv.setTextColor(Color.parseColor("#B4D31F"));
-        } else if ((info.inpm25/2)<=100 && (info.inpm25/2)>75){
+        } else if (info.inpm25alarmdata>=info.inpm25 && (info.inpm25alarmdata*75/100)<=info.inpm25){
             mWuRanTxtTv.setText("中度污染");
             mWuRanTxtTv.setTextColor(Color.parseColor("#F4B855"));
             mPm25BigTv.setTextColor(Color.parseColor("#F4B855"));
-        } else if ((info.inpm25/2)>100){
+        } else if (info.inpm25alarmdata<info.inpm25){
             mWuRanTxtTv.setText("重度污染");
             mWuRanTxtTv.setTextColor(Color.parseColor("#C6100B"));
             mPm25BigTv.setTextColor(Color.parseColor("#C6100B"));
@@ -528,7 +528,7 @@ private boolean isInit = true;
         }
     }
     private void setPm25TextShowStyle() {
-        if (info.inpm25alarmdata>0 && !"".equals(info.inpm25alarmdata+"") && info.inpm25>info.inpm25alarmdata){
+        if (info.inpm25alarmdata>0 && !"".equals(info.inpm25alarmdata+"") && info.inpm25>(info.inpm25alarmdata*75/100)){
 //            mPm25BigTv.setTextColor(Color.parseColor("#ff0000"));
             if(timerPM25 != null && mMP25clo) return;
             timerPM25 = new Timer();
