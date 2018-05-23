@@ -97,6 +97,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
 
     private void initData() {
         if (null == mlistbean.data || 1 > mlistbean.data.size()){
+            CommonUtils.mDeviceList = null;
             return;
         }
         mList = new ArrayList<>();

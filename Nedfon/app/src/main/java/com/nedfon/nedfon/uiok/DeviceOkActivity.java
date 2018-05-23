@@ -18,6 +18,7 @@ import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
 import com.nedfon.nedfon.bean.DeviceInfo;
 import com.nedfon.nedfon.bean.DeviceInfoAll;
+import com.nedfon.nedfon.db.MyDBHelper;
 import com.nedfon.nedfon.utils.CommonUtils;
 import com.nedfon.nedfon.utils.ToastUtils;
 import com.nedfon.nedfon.view.DeviceReSetNameDialog;
@@ -131,8 +132,16 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     }
 private boolean isInit = true;
 
+    private String getUserPhone(){
+        MyDBHelper dbHelper = new MyDBHelper(this);
+        return dbHelper.query().get(0).phone;
+    }
+
     // 接收/user/xiaoli/message路径发布的消息
     private void registerStompTopic() {
+        if (CommonUtils.phone == null || "".equals(CommonUtils.phone)){
+            CommonUtils.phone = getUserPhone();
+        }
         mStompClient.topic("/user/"+CommonUtils.phone+"/msg")
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
@@ -163,6 +172,9 @@ private boolean isInit = true;
     private static int num = 0;
 
     private void sendMessage(){
+        if (CommonUtils.phone == null || "".equals(CommonUtils.phone)){
+            CommonUtils.phone = getUserPhone();
+        }
         // 向/app/cheat发送Json数据
         mStompClient.send("/ws-push/welcome","{'name':'"+CommonUtils.phone+"'}").subscribe(new Subscriber<Void>() {
                     @Override
@@ -400,7 +412,7 @@ private boolean isInit = true;
                 if ("".equals(txt) || txt == null){
                     ToastUtils.show(DeviceOkActivity.this,"请输入设备名称");
                 } else {
-                    doModifyDeviceNameGet(CommonUtils.token,info.deviceid,txt,info.userphone);
+                    doModifyDeviceNameGet(CommonUtils.token,info.deviceid,txt);
                 }
             }
         });
@@ -888,12 +900,12 @@ private boolean isInit = true;
      * @param deviceSN
      * @param teminal
      */
-    private void doModifyDeviceNameGet(String token,String deviceSN,String teminal,String phone){
+    private void doModifyDeviceNameGet(String token,String deviceSN,String teminal){
         //1.拿到OkHttpClient对象
         FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
-        Request request = builder.url(CommonUtils.localhost+"mobileapi/modifyDeviceName?token="+token+"&deviceSN="+deviceSN+"&terminal="+teminal/*+"&userPHONE="+phone*/).get().build();
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/modifyDeviceName?token="+token+"&deviceSN="+deviceSN+"&terminal="+teminal).get().build();
         executeModifyDeviceNameRequest(request,teminal);
     }
 
@@ -1035,6 +1047,7 @@ private boolean isInit = true;
                     break;
                 case 7 :
                     ToastUtils.show(DeviceOkActivity.this,"解绑设备成功",3000);
+                    setBackOnClick();
                     if (mReNameDialog.isShowing())
                         mReNameDialog.dismiss();
                     break;
