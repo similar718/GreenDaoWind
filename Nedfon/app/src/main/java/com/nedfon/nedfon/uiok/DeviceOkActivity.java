@@ -61,6 +61,11 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     private ImageView mFengjiPowerKai,mFengjiPowerGuan,mFengjiPowerBg;
 
 
+    private RelativeLayout mQingxiAllRl;
+    private RelativeLayout mQingXiRl;
+    private ImageView mQingXiKai,mQingXiGuan,mQingXiBg;
+
+
     private SwitchButton mPowerSb;
     private SwitchButton mPaiqiHuanqiSb;
     private SwitchButton mFuliziSb;
@@ -74,6 +79,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     private int fulizi = 0;
     private int auto = 0;
     private int power = 0;
+    private int warnflag = 1;
 
     private int isdi = 0;
     private int misdi = 0;
@@ -88,6 +94,7 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
         super.onCreate(savedInstanceState);
         NAME = DeviceOkActivity.class.getSimpleName();
         setImage(3);
@@ -258,7 +265,18 @@ private boolean isInit = true;
     protected void onRestart() {
         super.onRestart();
         mIsStopThread = false;
+        setBackOnClick();
         doDeviceInfoGet(CommonUtils.token,CommonUtils.bean.deviceid);
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
     }
 
     @Override
@@ -304,6 +322,12 @@ private boolean isInit = true;
         mFengjiPowerGuan = this.findViewById(R.id.activity_device_fengji_power_guan_iv);
         mFengjiPowerBg = this.findViewById(R.id.fengji_power_iv);
 
+        mQingxiAllRl = this.findViewById(R.id.rl_qingxi);
+        mQingXiRl = this.findViewById(R.id.qingxi_bottom_rl);
+        mQingXiKai = this.findViewById(R.id.activity_device_qingxi_kai_iv);
+        mQingXiGuan = this.findViewById(R.id.activity_device_qingxi_guan_iv);
+        mQingXiBg = this.findViewById(R.id.qingxi_iv);
+
         mPaiqiHaunqiRl = this.findViewById(R.id.paiqi_huanqi_bottom_rl);
         mPaiqiHaunqiAuto = this.findViewById(R.id.activity_device_paiqi_huanqi_zidong_iv);
         mPaiqiHaunqiNoAuto = this.findViewById(R.id.activity_device_paiqi_huanqi_shoudong_iv);
@@ -329,6 +353,7 @@ private boolean isInit = true;
         mFuliziRl.setOnClickListener(this);
         mPaiqiHaunqiRl.setOnClickListener(this);
         mFengjiPowerRl.setOnClickListener(this);
+        mQingXiRl.setOnClickListener(this);
 
         mReNameDialog = new DeviceReSetNameDialog(DeviceOkActivity.this);
 
@@ -442,15 +467,15 @@ private boolean isInit = true;
         mPm25Tv.setText(info.outpm25+"");
 
         // A #437A14         C：  #B4D31F         F：  #F4B855        G：   #C6100B
-        if ((info.inpm25alarmdata*25/100)>=info.inpm25){
+        if ((info.inpm25alarmdata*0.25)>=info.inpm25){
             mWuRanTxtTv.setText("干净");
             mWuRanTxtTv.setTextColor(Color.parseColor("#437A14"));
             mPm25BigTv.setTextColor(Color.parseColor("#437A14"));
-        } else if ((info.inpm25alarmdata*75/100)>=info.inpm25 && (info.inpm25alarmdata*25/100)<=info.inpm25){
+        } else if ((info.inpm25alarmdata*0.75)>=info.inpm25 && (info.inpm25alarmdata*0.25)<=info.inpm25){
             mWuRanTxtTv.setText("轻度污染");
             mWuRanTxtTv.setTextColor(Color.parseColor("#B4D31F"));
             mPm25BigTv.setTextColor(Color.parseColor("#B4D31F"));
-        } else if (info.inpm25alarmdata>=info.inpm25 && (info.inpm25alarmdata*75/100)<=info.inpm25){
+        } else if (info.inpm25alarmdata>=info.inpm25 && (info.inpm25alarmdata*0.75)<=info.inpm25){
             mWuRanTxtTv.setText("中度污染");
             mWuRanTxtTv.setTextColor(Color.parseColor("#F4B855"));
             mPm25BigTv.setTextColor(Color.parseColor("#F4B855"));
@@ -460,6 +485,11 @@ private boolean isInit = true;
             mPm25BigTv.setTextColor(Color.parseColor("#C6100B"));
         }
 
+        if (info.status1 ==1){
+            mQingxiAllRl.setVisibility(View.VISIBLE);
+        } else {
+            mQingxiAllRl.setVisibility(View.GONE);
+        }
 
         setTeamperaTextShowStyle();
 
@@ -509,6 +539,16 @@ private boolean isInit = true;
             mFengjiPowerKai.setVisibility(View.GONE);
             mFengjiPowerGuan.setVisibility(View.VISIBLE);
             mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
+        }
+        //清洗默认开
+        if (warnflag==1){
+            mQingXiKai.setVisibility(View.VISIBLE);
+            mQingXiGuan.setVisibility(View.GONE);
+            mQingXiBg.setImageResource(R.drawable.kai1_icon);
+        } else {
+            mQingXiKai.setVisibility(View.GONE);
+            mQingXiGuan.setVisibility(View.VISIBLE);
+            mQingXiBg.setImageResource(R.drawable.on_off_btn_bg);
         }
 
         isdi = info.workgear;
@@ -574,6 +614,8 @@ private boolean isInit = true;
     private boolean mIsIonsFlag = false;
     private boolean mIsAuto = false;
     private boolean mIsHuanqi = false;
+    private boolean mIsWarnFlag = false;
+
 
 
     private int Temperatureclo = 0;
@@ -724,9 +766,10 @@ private boolean isInit = true;
                 mIsPower = false;
                 mIsAuto = false;
                 mIsHuanqi = false;
+                mIsWarnFlag = false;
                 int fulizi1 = fulizi==0?1:0;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        isdi+"",power+"",fulizi1+"","1",power+"");
+                        isdi+"",power+"",fulizi1+"",warnflag+"",power+"");
                 break;
             case R.id.paiqi_huanqi_bottom_rl:
                 if (power == 0){
@@ -737,18 +780,30 @@ private boolean isInit = true;
                 mIsPower = false;
                 mIsAuto = true;
                 mIsHuanqi = false;
+                mIsWarnFlag = false;
                 int auto11 = auto==1?2:1;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto11+"",
-                        isdi+"",power+"",fulizi+"","1",power+"");
+                        isdi+"",power+"",fulizi+"",warnflag+"",power+"");
                 break;
             case R.id.fengji_power_rl:
                 mIsIonsFlag = false;
                 mIsPower = true;
                 mIsAuto = false;
+                mIsWarnFlag = false;
                 mIsHuanqi = false;
                 int power10 = power==0?1:0;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        isdi+"",power10+"",fulizi+"","1",power10+"");
+                        isdi+"",power10+"",fulizi+"",warnflag+"",power10+"");
+                break;
+            case R.id.qingxi_bottom_rl: //TODO 清洗点击相应事件
+                mIsIonsFlag = false;
+                mIsPower = false;
+                mIsAuto = false;
+                mIsHuanqi = false;
+                mIsWarnFlag = true;
+                int warnflag1 = warnflag ==0?1:0;
+                doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
+                        isdi+"",power+"",fulizi+"",warnflag1+"",power+"");
                 break;
 
             case R.id.exhaust_ventilation_gao_rl://高档位
@@ -768,8 +823,9 @@ private boolean isInit = true;
                 mIsPower = false;
                 mIsAuto = false;
                 mIsHuanqi = true;
+                mIsWarnFlag = false;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        misdi+"",power+"",fulizi+"","1",power+"");
+                        misdi+"",power+"",fulizi+"",warnflag+"",power+"");
                 break;
 
             case R.id.exhaust_ventilation_di_rl: //低档位
@@ -789,8 +845,9 @@ private boolean isInit = true;
                 mIsPower = false;
                 mIsAuto = false;
                 mIsHuanqi = true;
+                mIsWarnFlag = false;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
-                        misdi+"",power+"",fulizi+"","1",power+"");
+                        misdi+"",power+"",fulizi+"",warnflag+"",power+"");
                 break;
 
             default:
@@ -1014,6 +1071,18 @@ private boolean isInit = true;
                             mFengjiPowerGuan.setVisibility(View.VISIBLE);
                             mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
                             power = 0;
+                        }
+                    } else if(mIsWarnFlag){
+                        if (warnflag != 1){
+                            mQingXiKai.setVisibility(View.VISIBLE);
+                            mQingXiGuan.setVisibility(View.GONE);
+                            mQingXiBg.setImageResource(R.drawable.kai1_icon);
+                            warnflag = 1;
+                        } else {
+                            mQingXiKai.setVisibility(View.GONE);
+                            mQingXiGuan.setVisibility(View.VISIBLE);
+                            mQingXiBg.setImageResource(R.drawable.on_off_btn_bg);
+                            warnflag = 0;
                         }
                     } else if(mIsHuanqi){
                         isdi = misdi;

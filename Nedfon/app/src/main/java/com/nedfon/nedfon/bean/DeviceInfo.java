@@ -19,6 +19,8 @@ public class DeviceInfo {
     public int commStatus; //通讯状态 0 不在线 1在线
     public String commTime; //通讯时间
     public int status; //错误状态码
+    public int status1; //错误状态码
+    public int status2; //错误状态码
     public String updatetime; //状态更新时间
     public int ionsflag; //负离子开关状态 0关闭 1打开
     public int workmodel; //工作模式 0自动 1手动
@@ -47,4 +49,5 @@ public class DeviceInfo {
     public int socket1;
     public String ip2;
     public int socket2;
+    public String deviceVersion;
 }
