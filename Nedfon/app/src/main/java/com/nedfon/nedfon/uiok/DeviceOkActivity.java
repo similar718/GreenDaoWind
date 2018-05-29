@@ -95,7 +95,6 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        super.onCreate(savedInstanceState);
         NAME = DeviceOkActivity.class.getSimpleName();
         setImage(3);
 //        setTitleText("设 备");
@@ -529,9 +528,9 @@ private boolean isInit = true;
             mFuliziGuan.setVisibility(View.VISIBLE);
             mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
         }
+        Log.e("ooooooooooooo"," 风机更新了  -------------" +power +" "+ auto+" "+fulizi);
         //电源开关
-        boolean poweropen = power ==0?false:true;
-        if (poweropen){
+        if (power == 1){
             mFengjiPowerKai.setVisibility(View.VISIBLE);
             mFengjiPowerGuan.setVisibility(View.GONE);
             mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
@@ -1035,69 +1034,7 @@ private boolean isInit = true;
         public void handleMessage(Message msg) {
             switch (msg.what){
                 case 1:
-                    ToastUtils.show(DeviceOkActivity.this,"设置成功！");
-                    if (mIsAuto){
-                        if (auto != 2){
-                            mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
-                            mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
-                            mPaiqiHuanqiBg.setImageResource(R.drawable.on_off_btn_bg);
-                            auto = 2;
-                        } else {
-                            auto = 1;
-                            mPaiqiHaunqiAuto.setVisibility(View.GONE);
-                            mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
-                            mPaiqiHuanqiBg.setImageResource(R.drawable.kai1_icon);
-                        }
-                    } else if(mIsIonsFlag){
-                        if (fulizi != 1){
-                            mFuliziKai.setVisibility(View.VISIBLE);
-                            mFuliziGuan.setVisibility(View.GONE);
-                            mFuliziBg.setImageResource(R.drawable.kai1_icon);
-                            fulizi = 1;
-                        } else {
-                            mFuliziKai.setVisibility(View.GONE);
-                            mFuliziGuan.setVisibility(View.VISIBLE);
-                            mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
-                            fulizi = 0;
-                        }
-                    } else if(mIsPower){
-                        if (power != 1){
-                            mFengjiPowerKai.setVisibility(View.VISIBLE);
-                            mFengjiPowerGuan.setVisibility(View.GONE);
-                            mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
-                            power = 1;
-                        } else {
-                            mFengjiPowerKai.setVisibility(View.GONE);
-                            mFengjiPowerGuan.setVisibility(View.VISIBLE);
-                            mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
-                            power = 0;
-                        }
-                    } else if(mIsWarnFlag){
-                        if (warnflag != 1){
-                            mQingXiKai.setVisibility(View.VISIBLE);
-                            mQingXiGuan.setVisibility(View.GONE);
-                            mQingXiBg.setImageResource(R.drawable.kai1_icon);
-                            warnflag = 1;
-                        } else {
-                            mQingXiKai.setVisibility(View.GONE);
-                            mQingXiGuan.setVisibility(View.VISIBLE);
-                            mQingXiBg.setImageResource(R.drawable.on_off_btn_bg);
-                            warnflag = 0;
-                        }
-                    } else if(mIsHuanqi){
-                        isdi = misdi;
-                        if (isdi==1){
-                            mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_selected);
-                            mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_unselect);
-                        } else if (isdi==2) {
-                            mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_unselect);
-                            mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_selected);
-                        } else {
-                            mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_unselect);
-                            mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_unselect);
-
-                        }
-                    }
+                    setInterface();
                     break;
                 case 2 :
                     ToastUtils.show(DeviceOkActivity.this,"其他错误");
@@ -1140,4 +1077,70 @@ private boolean isInit = true;
             }
         }
     };
+
+    private void setInterface(){
+        ToastUtils.show(DeviceOkActivity.this,"设置成功！");
+        Log.e("ooooooooooooo"," 风机更新了 onclick -------------" +power +" "+ auto+" "+fulizi);
+        if (mIsAuto){
+            if (auto == 2){
+                mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
+                mPaiqiHaunqiNoAuto.setVisibility(View.GONE);
+                mPaiqiHuanqiBg.setImageResource(R.drawable.on_off_btn_bg);
+                auto = 2;
+            } else {
+                auto = 1;
+                mPaiqiHaunqiAuto.setVisibility(View.GONE);
+                mPaiqiHaunqiNoAuto.setVisibility(View.VISIBLE);
+                mPaiqiHuanqiBg.setImageResource(R.drawable.kai1_icon);
+            }
+        } else if(mIsIonsFlag){
+            if (fulizi == 1){
+                mFuliziKai.setVisibility(View.VISIBLE);
+                mFuliziGuan.setVisibility(View.GONE);
+                mFuliziBg.setImageResource(R.drawable.kai1_icon);
+                fulizi = 1;
+            } else {
+                mFuliziKai.setVisibility(View.GONE);
+                mFuliziGuan.setVisibility(View.VISIBLE);
+                mFuliziBg.setImageResource(R.drawable.on_off_btn_bg);
+                fulizi = 0;
+            }
+        } else if(mIsPower){
+            if (power == 1){
+                mFengjiPowerKai.setVisibility(View.VISIBLE);
+                mFengjiPowerGuan.setVisibility(View.GONE);
+                mFengjiPowerBg.setImageResource(R.drawable.kai1_icon);
+                power = 1;
+            } else {
+                mFengjiPowerKai.setVisibility(View.GONE);
+                mFengjiPowerGuan.setVisibility(View.VISIBLE);
+                mFengjiPowerBg.setImageResource(R.drawable.on_off_btn_bg);
+                power = 0;
+            }
+        } else if(mIsWarnFlag){
+            if (warnflag == 1){
+                mQingXiKai.setVisibility(View.VISIBLE);
+                mQingXiGuan.setVisibility(View.GONE);
+                mQingXiBg.setImageResource(R.drawable.kai1_icon);
+                warnflag = 1;
+            } else {
+                mQingXiKai.setVisibility(View.GONE);
+                mQingXiGuan.setVisibility(View.VISIBLE);
+                mQingXiBg.setImageResource(R.drawable.on_off_btn_bg);
+                warnflag = 0;
+            }
+        } else if(mIsHuanqi){
+            isdi = misdi;
+            if (isdi==1){
+                mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_selected);
+                mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_unselect);
+            } else if (isdi==2) {
+                mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_unselect);
+                mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_selected);
+            } else {
+                mExhuastVentilationRlDi.setBackgroundResource(R.drawable.stall_btn_unselect);
+                mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_unselect);
+            }
+        }
+    }
 }
