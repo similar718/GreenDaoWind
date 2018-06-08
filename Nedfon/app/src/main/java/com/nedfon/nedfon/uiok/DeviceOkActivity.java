@@ -13,6 +13,7 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
@@ -29,8 +30,11 @@ import org.reactivestreams.Subscriber;
 import org.reactivestreams.Subscription;
 
 import java.io.IOException;
+import java.net.ConnectException;
+import java.net.SocketTimeoutException;
 import java.util.Timer;
 import java.util.TimerTask;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
@@ -92,12 +96,16 @@ public class DeviceOkActivity extends BaseTopBottomActivity implements View.OnCl
 
     private StompClient mStompClient;
 
+    private boolean mIsLoading = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         NAME = DeviceOkActivity.class.getSimpleName();
         setImage(3);
 //        setTitleText("设 备");
+
+        getService();
 
         initView();
         info = CommonUtils.bean;
@@ -160,8 +168,13 @@ private boolean isInit = true;
                             return;
                         }
                         if (CommonUtils.bean != info.data && info.data.deviceid.equals(DeviceSN)) { //当程序里面保存的数据与获取的数据不一样的时候 更新数据
+                            mIsLoading = false;
                             CommonUtils.bean = null;
                             CommonUtils.bean = info.data;
+
+                            if ((mIsPower && power!=CommonUtils.bean.workmodel) || (mIsAuto && auto != CommonUtils.bean.changeOrPushModel) || (mIsIonsFlag && fulizi != CommonUtils.bean.ionsflag) || (mIsHuanqi && isdi != CommonUtils.bean.workgear)){
+                                ToastUtils.show(DeviceOkActivity.this,"设置成功");
+                            }
                             mHandler.sendEmptyMessage(3);
                         }
                     }
@@ -794,7 +807,7 @@ private boolean isInit = true;
                 doControlWindCmdGet(CommonUtils.token,info.deviceid,auto+"",
                         isdi+"",power10+"",fulizi+"",warnflag+"",power10+"");
                 break;
-            case R.id.qingxi_bottom_rl: //TODO 清洗点击相应事件
+            case R.id.qingxi_bottom_rl:
                 mIsIonsFlag = false;
                 mIsPower = false;
                 mIsAuto = false;
@@ -869,6 +882,14 @@ private boolean isInit = true;
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call request, IOException e) {
+                if (e instanceof SocketTimeoutException) {
+                    // 判断超时异常
+                    mHandler.sendEmptyMessage(13);
+                }
+                if (e instanceof ConnectException) {
+                    // 判断连接异常
+                    mHandler.sendEmptyMessage(14);
+                }
                 e.printStackTrace();
                 return;
             }
@@ -891,8 +912,7 @@ private boolean isInit = true;
             }
         });
     }
-
-    private static OkHttpClient okhttpclient = new OkHttpClient();
+    private static OkHttpClient okhttpclient = new OkHttpClient();;
     /*
     http://localhost/mobileapi/controlWindCmd?token=abcvTkdjsd_1209990ijhyty&deviceSN=000000001&fanModel=30&fanLevel=1&fanOnOff=1&ionsOnOff=1&warnflag=1
     参数说明：
@@ -918,12 +938,11 @@ private boolean isInit = true;
         FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
         Request.Builder builder = new Request.Builder();
-        Log.e("-----------",CommonUtils.localhost+"mobileapi/controlWindCmd?" +
-                "token="+token+"&deviceSN="+deviceSN+"&OnOff="+OnOff+"&fanModel="+fanModel+"&fanLevel="+fanLevel+"&fanOnOff="+fanOnOff+"&ionsOnOff="+ionsOnOff+"&warnflag="+warnflag);
-        Request request = builder.url(CommonUtils.localhost+"mobileapi/controlWindCmd?" +
-                "token="+token+"&deviceSN="+deviceSN+"&OnOff="+OnOff+"&fanModel="+fanModel+"&fanLevel="+fanLevel+"&fanOnOff="+fanOnOff+"&ionsOnOff="+ionsOnOff+"&warnflag="+warnflag).get().build();
+        Request request = builder.url(CommonUtils.localhost+"mobileapi/controlWindCmd?" + "token="+token+"&deviceSN="+deviceSN+"&OnOff="+OnOff+"&fanModel="+fanModel+"&fanLevel="+fanLevel+"&fanOnOff="+fanOnOff+"&ionsOnOff="+ionsOnOff+"&warnflag="+warnflag).get().build();
         executeControlWindCmdRequest(request);
     }
+
+    String mError = "";
 
     private void executeControlWindCmdRequest(Request request) {
         //3.将Request封装为Call
@@ -932,6 +951,14 @@ private boolean isInit = true;
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call request, IOException e) {
+                if (e instanceof SocketTimeoutException) {
+                    // 判断超时异常
+                    mHandler.sendEmptyMessage(13);
+                }
+                if (e instanceof ConnectException) {
+                    // 判断连接异常
+                    mHandler.sendEmptyMessage(14);
+                }
                 e.printStackTrace();
                 return;
             }
@@ -942,7 +969,9 @@ private boolean isInit = true;
                 if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(1);
                 } else if (res.contains(CommonUtils.mFailed)){
-                    mHandler.sendEmptyMessage(5);
+                    DeviceInfoAll info = new Gson().fromJson(res,DeviceInfoAll.class);
+                    mError = info.msg;
+                    mHandler.sendEmptyMessage(15);
                 } else {
                     mHandler.sendEmptyMessage(2);
                 }
@@ -972,6 +1001,14 @@ private boolean isInit = true;
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call request, IOException e) {
+                if (e instanceof SocketTimeoutException) {
+                    // 判断超时异常
+                    mHandler.sendEmptyMessage(13);
+                }
+                if (e instanceof ConnectException) {
+                    // 判断连接异常
+                    mHandler.sendEmptyMessage(14);
+                }
                 e.printStackTrace();
                 return;
             }
@@ -989,6 +1026,15 @@ private boolean isInit = true;
                 }
             }
         });
+    }
+
+
+    /**
+     * 设置网络的超时时间
+     */
+    private void getService() {
+        //请求超时设置
+        okhttpclient.newBuilder().connectTimeout(5, TimeUnit.SECONDS).readTimeout(20, TimeUnit.SECONDS).build();
     }
 
     /**
@@ -1011,6 +1057,14 @@ private boolean isInit = true;
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call request, IOException e) {
+                if (e instanceof SocketTimeoutException) {
+                    // 判断超时异常
+                    mHandler.sendEmptyMessage(13);
+                }
+                if (e instanceof ConnectException) {
+                    // 判断连接异常
+                    mHandler.sendEmptyMessage(14);
+                }
                 e.printStackTrace();
                 return;
             }
@@ -1043,11 +1097,11 @@ private boolean isInit = true;
                     initData();
                     break;
                 case 5 :
-                    ToastUtils.show(DeviceOkActivity.this,"设置失败,可能设备离线！");
+                    ToastUtils.show(DeviceOkActivity.this,"设置失败");
                     break;
                 case 6 :
                     setTitleText(deviceName);
-                    ToastUtils.show(DeviceOkActivity.this,"提交成功",3000);
+                    ToastUtils.show(DeviceOkActivity.this,"设置成功",3000);
                     if (mReNameDialog.isShowing())
                         mReNameDialog.dismiss();
                     break;
@@ -1074,13 +1128,23 @@ private boolean isInit = true;
                     //订阅消息
                     registerStompTopic();
                     break;
+
+                case 13: //超时异常
+                    ToastUtils.show(DeviceOkActivity.this,"超时异常",1000);
+                    break;
+
+                case 14: //连接超时
+                    ToastUtils.show(DeviceOkActivity.this,"连接异常",1000);
+                    break;
+
+                case 15:
+                    ToastUtils.show(DeviceOkActivity.this,mError,1000);
+                    break;
             }
         }
     };
 
     private void setInterface(){
-        ToastUtils.show(DeviceOkActivity.this,"设置成功！");
-        Log.e("ooooooooooooo"," 风机更新了 onclick -------------" +power +" "+ auto+" "+fulizi);
         if (mIsAuto){
             if (auto == 2){
                 mPaiqiHaunqiAuto.setVisibility(View.VISIBLE);
@@ -1142,5 +1206,6 @@ private boolean isInit = true;
                 mExhuastVentilationRlGao.setBackgroundResource(R.drawable.stall_btn_unselect);
             }
         }
+        mHandler.sendEmptyMessage(6);
     }
 }

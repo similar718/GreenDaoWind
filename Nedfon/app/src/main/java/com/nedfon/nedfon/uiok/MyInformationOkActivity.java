@@ -98,6 +98,9 @@ public class MyInformationOkActivity extends BaseBottomActivity implements View.
     }
 
     private void initData() {
+        if (bean == null){
+            return;
+        }
         mPhoneumberTv.setText(bean.phone);
         mNameEt.setText(bean.nickname);
         mAddressTv.setText(bean.registerIp);

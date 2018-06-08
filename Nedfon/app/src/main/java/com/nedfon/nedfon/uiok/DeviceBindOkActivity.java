@@ -152,7 +152,7 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 
-                if (mlistbean.data.get(position).commStatus==1){ //在线
+//                if (mlistbean.data.get(position).commStatus==1){ //在线
                     CommonUtils.bean = null;
                     CommonUtils.bean = mlistbean.data.get(position);
                     SharedPreferences sp = getSharedPreferences("nedfon",MODE_PRIVATE);
@@ -162,14 +162,14 @@ public class DeviceBindOkActivity extends BaseBottomActivity {
                     Intent intent = new Intent(DeviceBindOkActivity.this,DeviceOkActivity.class);
                     startActivity(intent);
                     DeviceBindOkActivity.this.finish();
-                } else { //离线
-                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            isWIFIOrOther();
-                        }
-                    });
-                }
+//                } else { //离线
+//                    final DeviceSetInternetDialog dialog = new DeviceSetInternetDialog(DeviceBindOkActivity.this, new View.OnClickListener() {
+//                        @Override
+//                        public void onClick(View v) {
+//                            isWIFIOrOther();
+//                        }
+//                    });
+//                }
             }
         });
 

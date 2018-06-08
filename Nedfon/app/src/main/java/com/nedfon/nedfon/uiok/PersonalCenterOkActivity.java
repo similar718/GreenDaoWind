@@ -10,6 +10,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.google.gson.Gson;
 import com.nedfon.nedfon.R;
@@ -113,7 +114,6 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
 
         myDBHelper = new MyDBHelper(this);
 
-
         doGetPersonInfoGet(CommonUtils.token);
     }
 
@@ -131,8 +131,13 @@ public class PersonalCenterOkActivity extends BaseTopBottomActivity implements V
 
                 break;
             case R.id.fragment_personal_center_info_rl://个人信息RL
-                Intent information = new Intent(PersonalCenterOkActivity.this, MyInformationOkActivity.class);
-                startActivity(information);
+                if (CommonUtils.info == null){
+                    ToastUtils.show(this,"当前网络不是很好哦");
+                    doGetPersonInfoGet(CommonUtils.token);
+                } else {
+                    Intent information = new Intent(PersonalCenterOkActivity.this, MyInformationOkActivity.class);
+                    startActivity(information);
+                }
                 break;
             case R.id.fragment_personal_center_msg_rl://消息中心RL
                 Intent msgcenter = new Intent(PersonalCenterOkActivity.this, MessageCenterOkActivity.class);
