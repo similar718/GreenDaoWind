@@ -46,6 +46,11 @@ public class SexChoicePopupWindow extends PopupWindow {
         mManTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (sex != 0){
+                    mSureTv.setTextColor(Color.parseColor("#000000"));
+                } else {
+                    mSureTv.setTextColor(Color.parseColor("#B9B9B9"));
+                }
                 sex = 0;
                 mManTv.setTextColor(Color.parseColor("#000000"));
                 mWomanTv.setTextColor(Color.parseColor("#B9B9B9"));
@@ -54,6 +59,11 @@ public class SexChoicePopupWindow extends PopupWindow {
         mWomanTv.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                if (sex != 1){
+                    mSureTv.setTextColor(Color.parseColor("#000000"));
+                } else {
+                    mSureTv.setTextColor(Color.parseColor("#B9B9B9"));
+                }
                 sex = 1;
                 mManTv.setTextColor(Color.parseColor("#B9B9B9"));
                 mWomanTv.setTextColor(Color.parseColor("#000000"));
