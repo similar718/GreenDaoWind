@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.os.Handler;
 import android.os.Message;
 import android.os.Bundle;
+import android.support.annotation.UiThread;
 import android.util.Log;
 import android.view.Display;
 import android.view.View;
@@ -32,6 +33,7 @@ import org.reactivestreams.Subscription;
 import java.io.IOException;
 import java.net.ConnectException;
 import java.net.SocketTimeoutException;
+import java.util.Date;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.concurrent.TimeUnit;
@@ -171,7 +173,13 @@ private boolean isInit = true;
                             mIsLoading = false;
                             CommonUtils.bean = null;
                             CommonUtils.bean = info.data;
-
+//                            runOnUiThread(new Runnable() {
+//                                @Override
+//                                public void run() {
+//                                    Date date = new Date();
+//                                    ToastUtils.show(DeviceOkActivity.this," Received  = " + date.getTime());
+//                                }
+//                            });
                             if ((mIsPower && power!=CommonUtils.bean.workmodel) || (mIsAuto && auto != CommonUtils.bean.changeOrPushModel) || (mIsIonsFlag && fulizi != CommonUtils.bean.ionsflag) || (mIsHuanqi && isdi != CommonUtils.bean.workgear)){
                                 ToastUtils.show(DeviceOkActivity.this,"设置成功");
                             }
@@ -934,6 +942,13 @@ private boolean isInit = true;
     失败：{'result':0,'msg':'设置失败'}
      */
     private void doControlWindCmdGet(String token,String deviceSN,String fanModel,String fanLevel,String fanOnOff,String ionsOnOff,String warnflag,String OnOff){
+//        runOnUiThread(new Runnable() {
+//            @Override
+//            public void run() {
+//                Date date = new Date();
+//                ToastUtils.show(DeviceOkActivity.this,"send  = " + date.getTime());
+//            }
+//        });
         //1.拿到OkHttpClient对象
         FormBody.Builder requestBodyBuilder = new FormBody.Builder();
         //2.构造Request
@@ -951,6 +966,13 @@ private boolean isInit = true;
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call request, IOException e) {
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Date date = new Date();
+//                        ToastUtils.show(DeviceOkActivity.this,"send failed  = " + date.getTime());
+//                    }
+//                });
                 if (e instanceof SocketTimeoutException) {
                     // 判断超时异常
                     mHandler.sendEmptyMessage(13);
@@ -966,6 +988,13 @@ private boolean isInit = true;
             public void onResponse(Call request,Response response) throws IOException {
                 final String res = response.body().string();
                 Log.e("oooooooooo", "onResponse:  res = "+res );
+//                runOnUiThread(new Runnable() {
+//                    @Override
+//                    public void run() {
+//                        Date date = new Date();
+//                        ToastUtils.show(DeviceOkActivity.this,"send success  = " + date.getTime());
+//                    }
+//                });
                 if (res.contains(CommonUtils.mSuccess)){
                     mHandler.sendEmptyMessage(1);
                 } else if (res.contains(CommonUtils.mFailed)){
