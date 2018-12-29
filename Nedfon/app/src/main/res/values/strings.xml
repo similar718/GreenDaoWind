@@ -5,13 +5,13 @@
     <string name="activity_login_register_txt"><![CDATA[注 册]]></string>
     <string name="activity_login_sent_txt"><![CDATA[登 陆]]></string>
     <string name="activity_forgotpwd_sure_txt"><![CDATA[确 认]]></string>
-    <string name="activity_login_pwd_txt"><![CDATA[密         码 :]]></string>
+    <string name="activity_login_pwd_txt"><![CDATA[密       码 :]]></string>
     <string name="activity_login_phone_txt">手机号码 :</string>
     <string name="activity_login_pwd_prompt_txt">请输入密码</string>
     <string name="activity_login_phone_prompt_txt">请输入手机号码</string>
     <string name="activity_register_back_tv">返回</string>
     <string name="activity_register_pwd_long_tv">6位以上</string>
-    <string name="activity_register_invalid_tv"><![CDATA[验   证   码:]]></string>
+    <string name="activity_register_invalid_tv"><![CDATA[验  证  码:]]></string>
     <string name="activity_register_invalid_prompt_txt">请输入验证码</string>
     <string name="activity_register_send_invalid_txt">发送验证码</string>
     <string name="activity_register_welcome_prompt">欢迎注册使用！</string>

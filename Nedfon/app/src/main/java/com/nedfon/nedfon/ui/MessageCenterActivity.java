@@ -65,7 +65,7 @@
 //
 //        mBackTv.setOnClickListener(this);
 //
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//        mListView.setOnItemClickListener(new AdapterView.OnItemDeviceOptionClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                MessageCenterBean_test data = mList.get(position);

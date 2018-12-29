@@ -24,14 +24,17 @@
                 />
             <TextView
                 android:id="@+id/item_message_center_title_txt"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_toRightOf="@+id/img_iv"
                 android:layout_centerVertical="true"
                 android:layout_marginLeft="10dp"
                 android:text="绿岛风住宅全热新风系统解决方案"
+                android:layout_marginRight="90dp"
                 android:textColor="@color/black"
-                android:textSize="14sp"
+                android:singleLine="true"
+                android:ellipsize="end"
+                android:textSize="16sp"
                 />
 
             <TextView
@@ -42,7 +45,7 @@
                 android:layout_marginLeft="10dp"
                 android:text="2018-01-02"
                 android:textColor="@color/text_gray"
-                android:textSize="10sp"
+                android:textSize="13sp"
                 android:layout_alignParentRight="true"
                 android:layout_marginRight="10dp"
                 />
@@ -68,7 +71,7 @@
                 android:layout_marginLeft="10dp"
                 android:layout_centerVertical="true"
                 android:textColor="@color/text_gray"
-                android:textSize="12sp"
+                android:textSize="14sp"
                 android:lineSpacingExtra="5dp"
                 android:text="1.换风、除臭、除尘功能。取自高空的新鲜空气，经过滤、除尘、灭菌、加热/降温、加湿/除湿等处理过程"
                 android:maxLines="2"

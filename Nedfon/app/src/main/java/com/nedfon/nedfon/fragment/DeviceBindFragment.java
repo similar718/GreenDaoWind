@@ -117,7 +117,7 @@
 //            }
 //        });
 //
-//        mListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//        mListView.setOnItemClickListener(new AdapterView.OnItemDeviceOptionClickListener() {
 //            @Override
 //            public void onItemClick(AdapterView<?> parent, View view, final int position, long id) {
 //

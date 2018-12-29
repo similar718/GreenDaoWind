@@ -118,6 +118,9 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             mPhoneEt.setText(list.get(0).phone);
             mPwdEt.setText(list.get(0).pwd);
         }
+        if (CommonUtils.mPhoneNum != null && !"".equals(CommonUtils.mPhoneNum)){
+            mPhoneEt.setText(CommonUtils.mPhoneNum);
+        }
     }
 
     private void primissionAsk() {
@@ -330,6 +333,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
                     break;
                 case 3 :
                     ToastUtils.show(LoginActivity.this,"登陆成功");
+                    CommonUtils.mPhoneNum = "";
                     break;
                 case 4 :
                     ToastUtils.show(LoginActivity.this,"其他问题错误！");

@@ -30,6 +30,8 @@ public class CommonUtils {
     public static String mFailed = "result\":0,";
     public static String mSuccess = "result\":1,";
 
+    public static String mPhoneNum = "";
+
     public static String token = "";
     public static String phone = "";
     public static String deviceSN = "";

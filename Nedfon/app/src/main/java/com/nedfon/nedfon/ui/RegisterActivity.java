@@ -247,6 +247,7 @@ public class RegisterActivity extends AppCompatActivity implements View.OnClickL
                     break;
                 case REGISTER_SUCCESS :
                     ToastUtils.show(RegisterActivity.this,"注册成功！");
+                    CommonUtils.mPhoneNum = mPhoneEt.getText().toString().trim();
                     RegisterActivity.this.finish();
                     break;
                 case OTHER_ERROR :

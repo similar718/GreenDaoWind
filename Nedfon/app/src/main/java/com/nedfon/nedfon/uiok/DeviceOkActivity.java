@@ -181,7 +181,7 @@ private boolean isInit = true;
 //                                }
 //                            });
                             if ((mIsPower && power!=CommonUtils.bean.workmodel) || (mIsAuto && auto != CommonUtils.bean.changeOrPushModel) || (mIsIonsFlag && fulizi != CommonUtils.bean.ionsflag) || (mIsHuanqi && isdi != CommonUtils.bean.workgear)){
-                                ToastUtils.show(DeviceOkActivity.this,"设置成功");
+//                                ToastUtils.show(DeviceOkActivity.this,"设置成功");
                             }
                             mHandler.sendEmptyMessage(3);
                         }
@@ -1130,7 +1130,7 @@ private boolean isInit = true;
                     break;
                 case 6 :
                     setTitleText(deviceName);
-                    ToastUtils.show(DeviceOkActivity.this,"设置成功",3000);
+//                    ToastUtils.show(DeviceOkActivity.this,"设置成功",3000);
                     if (mReNameDialog.isShowing())
                         mReNameDialog.dismiss();
                     break;
